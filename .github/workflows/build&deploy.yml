@@ -8,6 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Prepare
+      run: |
+        sudo apt-get update
+        sudo apt-get install libxinerama-dev libxcursor-dev libpango1.0-dev
     - name: Build
       run: cargo build --release
     - name: ls release
