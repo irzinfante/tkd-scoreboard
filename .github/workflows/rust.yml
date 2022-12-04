@@ -20,7 +20,7 @@ jobs:
     - name: Prepare
       run: |
         sudo apt-get update
-        sudo apt-get install libxinerama-dev libxcursor-dev libpango-1.0-0
+        sudo apt-get install libxinerama-dev libxcursor-dev libpango1.0-dev
     - name: Build
       run: cargo build --verbose
     - name: Run tests
