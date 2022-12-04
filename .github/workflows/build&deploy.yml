@@ -11,7 +11,7 @@ jobs:
     - name: Prepare
       run: |
         sudo apt-get update
-        sudo apt-get install libxinerama-dev libxcursor-dev libpango1.0-dev
+        sudo apt-get install libxinerama-dev libxcursor-dev libpango1.0-dev mingw-w64
         rustup target add x86_64-pc-windows-gnu
     - name: Build
       run: cargo build --release
