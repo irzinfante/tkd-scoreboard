@@ -13,10 +13,14 @@ env:
 jobs:
   build:
 
-    runs-on: rust:1.65.0-bullseye
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
+    - name: Prepare
+      run: |
+        apt-get update
+        apt-get install libxinerama-dev
     - name: Build
       run: cargo build --verbose
     - name: Run tests
