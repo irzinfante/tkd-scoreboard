@@ -307,13 +307,13 @@ impl Scoreboard {
 				Winner::Cheong => {
 					self.display.contest_winner_lbl.set_label("CHEONG SEUNG");
 					self.display.contest_winner_lbl.set_color(enums::Color::Blue);
-					self.screen.contest_winner_lbl.set_label("CHEONG\n SEUNG");
+					self.screen.contest_winner_lbl.set_label("CHEONG\nSEUNG");
 					self.screen.contest_winner_lbl.set_color(enums::Color::Blue);
 				},
 				Winner::Hong => {
 					self.display.contest_winner_lbl.set_label("HONG SEUNG");
 					self.display.contest_winner_lbl.set_color(enums::Color::Red);
-					self.screen.contest_winner_lbl.set_label("HONG\n SEUNG");
+					self.screen.contest_winner_lbl.set_label("HONG\nSEUNG");
 					self.screen.contest_winner_lbl.set_color(enums::Color::Red);
 				},
 				_ => ()
