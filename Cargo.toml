@@ -1,0 +1,13 @@
+[package]
+name = "tkd-scoreboard"
+version = "1.0.0"
+edition = "2021"
+authors = ["irzinfante <contact@irzinfante.eu>"]
+repository = "https://github.com/irzinfante/tkd-scoreboard/"
+license = "GPL-3.0"
+license-file = "LICENSE"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+fltk = { version = "1.3.16", features = ["fltk-bundled"] }
