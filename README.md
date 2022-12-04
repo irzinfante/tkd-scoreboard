@@ -13,10 +13,10 @@ Executables for Windows and UNIX-like systems can be downloaded from the [releas
 |:--:|
 | *On new program execution round time and rest time can be configured for the contest. Selected values remain the same in consecutive contests.* |
 
-| <table><tbody><tr><td>![scoreboard-1.png](screenshots/scoreboard-1.png)</td><td>![scoreboard-2.png](screenshots/scoreboard-2.png)</td></tr><tr><td>![scoreboard-3.png](screenshots/scoreboard-3.png)</td><td>![scoreboard-4.png](screenshots/scoreboard-4.png)</td></tr></tbody></table> |
+| <table><tbody><tr><td style="width:400px">![scoreboard-1.png](screenshots/scoreboard-1.png)</td><td style="width:400px">![scoreboard-2.png](screenshots/scoreboard-2.png)</td></tr><tr><td style="width:400px">![scoreboard-3.png](screenshots/scoreboard-3.png)</td><td style="width:400px">![scoreboard-4.png](screenshots/scoreboard-4.png)</td></tr></tbody></table> |
 |:--:|
 | *Different stages of the contest from start to the end of the match.* |
 
-| <table><tbody><tr><td>![screen-1.png](screenshots/screen-1.png)</td><td>![screen-2.png](screenshots/screen-2.png)</td></tr><tr><td>![screen-3.png](screenshots/screen-3.png)</td><td>![screen-4.png](screenshots/screen-4.png)</td></tr></tbody></table> |
+| <table><tbody><tr><td style="width:400px">![screen-1.png](screenshots/screen-1.png)</td><td style="width:400px">![screen-2.png](screenshots/screen-2.png)</td></tr><tr><td style="width:400px">![screen-3.png](screenshots/screen-3.png)</td><td style="width:400px">![screen-4.png](screenshots/screen-4.png)</td></tr></tbody></table> |
 |:--:|
 | *Same as previous but from the screen view.* |
