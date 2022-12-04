@@ -1,0 +1,18 @@
+name: Build and deploy artifact
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo build --release
+    - name: ls release
+      run: ls -al target/release
+    - name: Build Windows
+      run: cargo build --release --target x86_64-pc-windows-gnu
+    - name: ls release windows
+      run: ls -al target/x86_64-pc-windows-gnu/release
