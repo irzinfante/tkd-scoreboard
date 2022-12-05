@@ -1,6 +1,6 @@
 [package]
 name = "tkd-scoreboard"
-version = "1.0.2"
+version = "1.0.3"
 edition = "2021"
 authors = ["irzinfante <contact@irzinfante.eu>"]
 repository = "https://github.com/irzinfante/tkd-scoreboard/"
