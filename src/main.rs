@@ -26,7 +26,7 @@ fn main() {
     
     let mut main_win = window::Window::default()
     	.with_size(screen_width as i32, screen_height as i32)
-    	.with_label("TKD Scoreboard");
+    	.with_label("TKD Scoreboard - Scoreboard");
     main_win.make_resizable(true);
 	
 	let display = Display {
@@ -106,7 +106,8 @@ fn main() {
     main_win.show();
     
     let mut screen_win = window::Window::default()
-    	.with_size(screen_width as i32, screen_height as i32);
+    	.with_size(screen_width as i32, screen_height as i32)
+    	.with_label("TKD Scoreboard - Screen");
     screen_win.make_resizable(true);
     
 	let screen = Screen {
