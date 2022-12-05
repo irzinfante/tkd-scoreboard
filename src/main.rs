@@ -1,3 +1,21 @@
+/**
+ * Scoreboard program for taekwondo competition
+ * Copyright (C) 2022 Iker Ruiz de Infante Gonzalez <contact@irzinfante.eu>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 use fltk::{prelude::*, *};
 use tkd_scoreboard::*;
 use std::{thread, time::Duration};
@@ -82,6 +100,8 @@ fn main() {
 		hong_superiority_decision_btn: hong_superiority_decision_btn(screen_width, screen_height)
 	};
 	
+	copyright(screen_width, screen_height);
+	
     main_win.end();
     main_win.show();
     
@@ -105,6 +125,8 @@ fn main() {
 		
 		contest_winner_lbl: contest_winner_screen_lbl(screen_width, screen_height)
 	};
+	
+	copyright(screen_width, screen_height);
 	
     screen_win.end();
     screen_win.show();
@@ -1405,4 +1427,13 @@ fn hong_superiority_decision_btn(screen_width: f64, screen_height: f64) -> butto
 	hong_superiority_decision_btn.set_label_color(enums::Color::White);
 	hong_superiority_decision_btn.hide();
 	return hong_superiority_decision_btn;
+}
+
+fn copyright(_screen_width: f64, screen_height: f64) -> frame::Frame {
+	let mut copyright = frame::Frame::default()
+		.with_pos(0, screen_height as i32)
+		.with_align(enums::Align::RightBottom)
+		.with_label("Copyright (C) 2022 Iker Ruiz de Infante Gonzalez <contact@@irzinfante.eu>");
+	copyright.set_label_size(10);
+	return copyright;
 }

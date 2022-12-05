@@ -20,3 +20,15 @@ Executables for Windows and UNIX-like systems can be downloaded from the [releas
 | <table><tbody><tr><td style="width:400px">![screen-1.png](screenshots/screen-1.png)</td><td style="width:400px">![screen-2.png](screenshots/screen-2.png)</td></tr><tr><td style="width:400px">![screen-3.png](screenshots/screen-3.png)</td><td style="width:400px">![screen-4.png](screenshots/screen-4.png)</td></tr></tbody></table> |
 |:--:|
 | *Same as previous but from the screen view.* |
+
+## License
+
+Copyright (C) 2022 Iker Ruiz de Infante Gonzalez contact@irzinfante.eu
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+[LICENSE](LICENSE) contains a copy of the full GPLv3 licensing conditions.
