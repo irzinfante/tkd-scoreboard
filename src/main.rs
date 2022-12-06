@@ -28,6 +28,7 @@ fn main() {
     	.with_size(screen_width as i32, screen_height as i32)
     	.with_label("TKD Scoreboard - Scoreboard");
     main_win.make_resizable(true);
+    main_win.set_icon(Some(image::SvgImage::from_data(ICON).unwrap()));
 	
 	let display = Display {
 		cheong_score_lbl: cheong_score_lbl(screen_width, screen_height),
@@ -109,6 +110,7 @@ fn main() {
     	.with_size(screen_width as i32, screen_height as i32)
     	.with_label("TKD Scoreboard - Screen");
     screen_win.make_resizable(true);
+    screen_win.set_icon(Some(image::SvgImage::from_data(ICON).unwrap()));
     
 	let screen = Screen {
 		hong_score_lbl: hong_score_screen_lbl(screen_width, screen_height),
