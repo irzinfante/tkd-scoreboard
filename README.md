@@ -22,7 +22,7 @@ Terminal=false
 Categories=Game;Utility;
 ```
 
-Put the Unix-like binary from releases downloads in `~/.local/bin` and the [icon file](assets/tkd-scoreboard.png) in `~/.icons` to make them available for the desktop entry file.
+Put the Unix-like binary from releases downloads in `~/.local/bin` (remember to modify its permissions to allow execution) and the [icon file](assets/tkd-scoreboard.png) in `~/.icons` to make them available for the desktop entry file.
 
 ## Screenshots
 
