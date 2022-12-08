@@ -174,7 +174,101 @@ fn main() {
 		    hong_olgul_count: 0,
 		    hong_momdollyeo_olgul_count: 0
 		}
-	);
+	);	
+    
+    let scoreboard_resize = scoreboard.clone();
+    main_win.resize_callback(move |_win, _x, _y, w, h| {
+		let (x, y, d) = seung_lbl_dimensions(w as f64, h as f64);
+		
+		scoreboard_resize.with_lock(|share| {
+			rount_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
+			round_time_seconds_lbl.set_label_size(scale_size(15., w as f64, h as f64));
+			rest_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
+			rest_time_seconds_lbl.set_label_size(scale_size(15., w as f64, h as f64));
+			
+			share.display.cheong_score_lbl.set_label_size(scale_size(400., w as f64, h as f64));
+			share.display.cheong_gam_jeon_count_lbl.set_label_size(scale_size(90., w as f64, h as f64));
+			share.display.cheong_seung_lbl.set_pos(((w as f64) * 1./3. + x) as i32, y as i32);
+			share.display.cheong_seung_lbl.set_size(d, d);
+			
+			share.display.hong_score_lbl.set_label_size(scale_size(400., w as f64, h as f64));
+			share.display.hong_gam_jeon_count_lbl.set_label_size(scale_size(90., w as f64, h as f64));
+			share.display.hong_seung_lbl.set_pos(((w as f64) * 5./9. + x) as i32, y as i32);
+			share.display.hong_seung_lbl.set_size(d, d);
+			
+			share.display.round_rest_lbl.set_label_size(scale_size(40., w as f64, h as f64));
+			share.display.round_number_lbl.set_label_size(scale_size(150., w as f64, h as f64));
+			share.display.time_lbl.set_label_size(scale_size(215., w as f64, h as f64));
+			
+			share.controls.new_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.si_jak_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.kye_sok_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.kal_yeo_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.keu_man_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.end_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.resume_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			
+			share.display.contest_winner_lbl.set_label_size(scale_size(120., w as f64, h as f64));
+			
+			share.controls.cheong_plus_jirugi_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_JIRUGI).unwrap()));
+			share.controls.cheong_minus_jirugi_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_JIRUGI).unwrap()));
+			share.controls.cheong_plus_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMTONG).unwrap()));
+			share.controls.cheong_minus_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMTONG).unwrap()));
+			share.controls.cheong_plus_momdollyeo_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMDOLLYEO_MOMTONG).unwrap()));
+			share.controls.cheong_minus_momdollyeo_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMDOLLYEO_MOMTONG).unwrap()));
+			share.controls.cheong_plus_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_OLGUL).unwrap()));
+			share.controls.cheong_minus_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_OLGUL).unwrap()));
+			share.controls.cheong_plus_momdollyeo_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMDOLLYEO_OLGUL).unwrap()));
+			share.controls.cheong_minus_momdollyeo_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMDOLLYEO_OLGUL).unwrap()));
+			share.controls.cheong_plus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.cheong_minus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			
+			share.controls.plus_1_second_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.minus_1_second_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			
+			share.controls.hong_plus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.hong_minus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.hong_plus_jirugi_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_JIRUGI).unwrap()));
+			share.controls.hong_minus_jirugi_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_JIRUGI).unwrap()));
+			share.controls.hong_plus_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMTONG).unwrap()));
+			share.controls.hong_minus_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMTONG).unwrap()));
+			share.controls.hong_plus_momdollyeo_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMDOLLYEO_MOMTONG).unwrap()));
+			share.controls.hong_minus_momdollyeo_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMDOLLYEO_MOMTONG).unwrap()));
+			share.controls.hong_plus_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_OLGUL).unwrap()));
+			share.controls.hong_minus_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_OLGUL).unwrap()));
+			share.controls.hong_plus_momdollyeo_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMDOLLYEO_OLGUL).unwrap()));
+			share.controls.hong_minus_momdollyeo_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMDOLLYEO_OLGUL).unwrap()));
+			
+			share.display.superiority_decision_lbl.set_label_size(scale_size(40., w as f64, h as f64));
+			share.controls.cheong_superiority_decision_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.hong_superiority_decision_btn.set_label_size(scale_size(25., w as f64, h as f64));
+		});
+	});
+    main_win.resize(main_win.x(), main_win.y(), main_win.width(), main_win.height());
+	
+	let screen_resize = scoreboard.clone();
+    screen_win.resize_callback(move |_win, _x, _y, w, h| {
+		let (x, y, d) = seung_screen_lbl_dimensions(w as f64, h as f64);
+		
+		screen_resize.with_lock(|share| {
+			share.screen.hong_score_lbl.set_label_size(scale_size(475., w as f64, h as f64));
+			share.screen.hong_gam_jeon_count_lbl.set_label_size(scale_size(125., w as f64, h as f64));
+			share.screen.hong_seung_lbl.set_pos(((w as f64) * 4./18. + x) as i32, y as i32);
+			share.screen.hong_seung_lbl.set_size(d, d);
+			
+			share.screen.cheong_score_lbl.set_label_size(scale_size(475., w as f64, h as f64));
+			share.screen.cheong_gam_jeon_count_lbl.set_label_size(scale_size(125., w as f64, h as f64));
+			share.screen.cheong_seung_lbl.set_pos(((w as f64) * 12./18. + x) as i32, y as i32);
+			share.screen.cheong_seung_lbl.set_size(d, d);
+			
+			share.screen.round_rest_lbl.set_label_size(scale_size(75., w as f64, h as f64));
+			share.screen.round_number_lbl.set_label_size(scale_size(175., w as f64, h as f64));
+			share.screen.time_lbl.set_label_size(scale_size(250., w as f64, h as f64));
+			
+			share.screen.contest_winner_lbl.set_label_size(scale_size(100., w as f64, h as f64));
+		});
+	});
+    screen_win.resize(screen_win.x(), screen_win.y(), screen_win.width(), screen_win.height());
     
 	scoreboard.clone().with_lock(|share| {
 		let scoreboard_new_contest_btn = scoreboard.clone();
@@ -635,98 +729,6 @@ fn main() {
 			scoreboard_hong_superiority_decision_btn.with_lock(|share| {
 				share.decide_winner(Winner::Hong);
 			})
-		});
-	});	
-    
-    let scoreboard_resize = scoreboard.clone();
-    main_win.resize_callback(move |_win, _x, _y, w, h| {
-		let (x, y, d) = seung_lbl_dimensions(w as f64, h as f64);
-		
-		scoreboard_resize.with_lock(|share| {
-			rount_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
-			round_time_seconds_lbl.set_label_size(scale_size(15., w as f64, h as f64));
-			rest_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
-			rest_time_seconds_lbl.set_label_size(scale_size(15., w as f64, h as f64));
-			
-			share.display.cheong_score_lbl.set_label_size(scale_size(400., w as f64, h as f64));
-			share.display.cheong_gam_jeon_count_lbl.set_label_size(scale_size(90., w as f64, h as f64));
-			share.display.cheong_seung_lbl.set_pos(((w as f64) * 1./3. + x) as i32, y as i32);
-			share.display.cheong_seung_lbl.set_size(d, d);
-			
-			share.display.hong_score_lbl.set_label_size(scale_size(400., w as f64, h as f64));
-			share.display.hong_gam_jeon_count_lbl.set_label_size(scale_size(90., w as f64, h as f64));
-			share.display.hong_seung_lbl.set_pos(((w as f64) * 5./9. + x) as i32, y as i32);
-			share.display.hong_seung_lbl.set_size(d, d);
-			
-			share.display.round_rest_lbl.set_label_size(scale_size(40., w as f64, h as f64));
-			share.display.round_number_lbl.set_label_size(scale_size(150., w as f64, h as f64));
-			share.display.time_lbl.set_label_size(scale_size(225., w as f64, h as f64));
-			
-			share.controls.new_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.si_jak_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.kye_sok_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.kal_yeo_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.keu_man_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.end_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.resume_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			
-			share.display.contest_winner_lbl.set_label_size(scale_size(120., w as f64, h as f64));
-			
-			share.controls.cheong_plus_jirugi_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_JIRUGI).unwrap()));
-			share.controls.cheong_minus_jirugi_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_JIRUGI).unwrap()));
-			share.controls.cheong_plus_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMTONG).unwrap()));
-			share.controls.cheong_minus_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMTONG).unwrap()));
-			share.controls.cheong_plus_momdollyeo_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMDOLLYEO_MOMTONG).unwrap()));
-			share.controls.cheong_minus_momdollyeo_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMDOLLYEO_MOMTONG).unwrap()));
-			share.controls.cheong_plus_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_OLGUL).unwrap()));
-			share.controls.cheong_minus_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_OLGUL).unwrap()));
-			share.controls.cheong_plus_momdollyeo_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMDOLLYEO_OLGUL).unwrap()));
-			share.controls.cheong_minus_momdollyeo_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMDOLLYEO_OLGUL).unwrap()));
-			share.controls.cheong_plus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.cheong_minus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			
-			share.controls.plus_1_second_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.minus_1_second_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			
-			share.controls.hong_plus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.hong_minus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.hong_plus_jirugi_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_JIRUGI).unwrap()));
-			share.controls.hong_minus_jirugi_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_JIRUGI).unwrap()));
-			share.controls.hong_plus_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMTONG).unwrap()));
-			share.controls.hong_minus_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMTONG).unwrap()));
-			share.controls.hong_plus_momdollyeo_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMDOLLYEO_MOMTONG).unwrap()));
-			share.controls.hong_minus_momdollyeo_momtong_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMDOLLYEO_MOMTONG).unwrap()));
-			share.controls.hong_plus_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_OLGUL).unwrap()));
-			share.controls.hong_minus_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_OLGUL).unwrap()));
-			share.controls.hong_plus_momdollyeo_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMDOLLYEO_OLGUL).unwrap()));
-			share.controls.hong_minus_momdollyeo_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMDOLLYEO_OLGUL).unwrap()));
-			
-			share.display.superiority_decision_lbl.set_label_size(scale_size(40., w as f64, h as f64));
-			share.controls.cheong_superiority_decision_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.hong_superiority_decision_btn.set_label_size(scale_size(25., w as f64, h as f64));
-		});
-	});
-	
-	let screen_resize = scoreboard.clone();
-    screen_win.resize_callback(move |_win, _x, _y, w, h| {
-		let (x, y, d) = seung_screen_lbl_dimensions(w as f64, h as f64);
-		
-		screen_resize.with_lock(|share| {
-			share.screen.hong_score_lbl.set_label_size(scale_size(475., w as f64, h as f64));
-			share.screen.hong_gam_jeon_count_lbl.set_label_size(scale_size(125., w as f64, h as f64));
-			share.screen.hong_seung_lbl.set_pos(((w as f64) * 4./18. + x) as i32, y as i32);
-			share.screen.hong_seung_lbl.set_size(d, d);
-			
-			share.screen.cheong_score_lbl.set_label_size(scale_size(475., w as f64, h as f64));
-			share.screen.cheong_gam_jeon_count_lbl.set_label_size(scale_size(125., w as f64, h as f64));
-			share.screen.cheong_seung_lbl.set_pos(((w as f64) * 12./18. + x) as i32, y as i32);
-			share.screen.cheong_seung_lbl.set_size(d, d);
-			
-			share.screen.round_rest_lbl.set_label_size(scale_size(75., w as f64, h as f64));
-			share.screen.round_number_lbl.set_label_size(scale_size(175., w as f64, h as f64));
-			share.screen.time_lbl.set_label_size(scale_size(275., w as f64, h as f64));
-			
-			share.screen.contest_winner_lbl.set_label_size(scale_size(100., w as f64, h as f64));
 		});
 	});
 
