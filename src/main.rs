@@ -731,7 +731,7 @@ fn main() {
 			})
 		});
 	});
-
+	
     while app.wait() {
 		if !main_win.shown() || !screen_win.shown() {
 			panic!("Exit!");
@@ -1438,7 +1438,7 @@ fn copyright(_screen_width: f64, screen_height: f64) -> frame::Frame {
 	let mut copyright = frame::Frame::default()
 		.with_pos(0, screen_height as i32)
 		.with_align(enums::Align::RightBottom)
-		.with_label("Copyright (C) 2022 Iker Ruiz de Infante Gonzalez <contact@@irzinfante.eu>");
+		.with_label(&format!("v{} -  Copyright (C) 2022 Iker Ruiz de Infante Gonzalez <contact@@irzinfante.eu>", env!("CARGO_PKG_VERSION")));
 	copyright.set_label_size(10);
 	return copyright;
 }
