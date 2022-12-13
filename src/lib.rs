@@ -289,7 +289,8 @@ impl Scoreboard {
 			return Winner::Hong;
 		}
 		
-		// More hits count
+		// More hits count (Suppressed as of v1.1.0)
+		/*
 		let cheong_hits_count = self.cheong_jirugi_count + self.cheong_momtong_count + self.cheong_momdollyeo_momtong_count
 			+ self.cheong_olgul_count + self.cheong_momdollyeo_olgul_count;
 		let hong_hits_count = self.hong_jirugi_count + self.hong_momtong_count + self.hong_momdollyeo_momtong_count
@@ -299,6 +300,7 @@ impl Scoreboard {
 		} else if cheong_hits_count != hong_hits_count {
 			return Winner::Hong;
 		}
+		*/
 		
 		// Determine superiority
 		return Winner::None;
