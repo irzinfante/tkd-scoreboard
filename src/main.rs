@@ -561,6 +561,7 @@ fn main() {
 				if share.cheong_gam_jeon_count > 4 {
 					cheong_plus_gam_jeon_btn.deactivate();
 				}
+				share.check_fifth_gam_jeon();
 			});
 		});
 		
@@ -573,6 +574,7 @@ fn main() {
 				if share.cheong_gam_jeon_count == 0 {
 					cheong_minus_gam_jeon_btn.deactivate();
 				}
+				share.check_fifth_gam_jeon();
 			});
 		});
 		
@@ -602,6 +604,7 @@ fn main() {
 				if share.hong_gam_jeon_count > 4 {
 					hong_plus_gam_jeon_btn.deactivate();
 				}
+				share.check_fifth_gam_jeon();
 			});
 		});
 		
@@ -614,6 +617,7 @@ fn main() {
 				if share.hong_gam_jeon_count == 0 {
 					hong_minus_gam_jeon_btn.deactivate();
 				}
+				share.check_fifth_gam_jeon();
 			});
 		});
 		

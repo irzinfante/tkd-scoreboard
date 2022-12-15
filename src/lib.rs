@@ -231,6 +231,19 @@ impl Scoreboard {
 		return false;
 	}
 	
+	pub fn check_fifth_gam_jeon(&mut self) {
+		if self.cheong_gam_jeon_count > 4 && self.hong_gam_jeon_count == 4 {
+			self.controls.hong_plus_gam_jeon_btn.deactivate();
+		} else if self.hong_gam_jeon_count == 4 {
+			self.controls.hong_plus_gam_jeon_btn.activate();
+		}
+		if self.hong_gam_jeon_count > 4 && self.cheong_gam_jeon_count == 4 {
+			self.controls.cheong_plus_gam_jeon_btn.deactivate();
+		} else if self.cheong_gam_jeon_count == 4 {
+			self.controls.cheong_plus_gam_jeon_btn.activate();
+		}
+	}
+	
 	pub fn round_winner(&self) -> Winner {
 		
 		// 5 gam-jeons
