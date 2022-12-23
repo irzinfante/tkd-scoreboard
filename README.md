@@ -30,11 +30,11 @@ Put the Unix-like binary from releases downloads in `~/.local/bin` (remember to 
 |:--:|
 | *On new program execution round time and rest time can be configured for the contest. Selected values remain the same in consecutive contests.* |
 
-| <table><tbody><tr><td style="width:400px">![scoreboard-1.png](screenshots/scoreboard-1.png)</td><td style="width:400px">![scoreboard-2.png](screenshots/scoreboard-2.png)</td></tr><tr><td style="width:400px">![scoreboard-3.png](screenshots/scoreboard-3.png)</td><td style="width:400px">![scoreboard-4.png](screenshots/scoreboard-4.png)</td></tr></tbody></table> |
+| <table><tbody><tr><td style="width:400px">![scoreboard-1.png](screenshots/scoreboard-1.png)</td><td style="width:400px">![scoreboard-2.png](screenshots/scoreboard-2.png)</td></tr><tr><td style="width:400px">![scoreboard-3.png](screenshots/scoreboard-3.png)</td><td style="width:400px">![scoreboard-4.png](screenshots/scoreboard-4.png)</td></tr><tr><td style="width:400px">![scoreboard-5.png](screenshots/scoreboard-5.png)</td><td style="width:400px">![scoreboard-6.png](screenshots/scoreboard-6.png)</td></tr></tbody></table> |
 |:--:|
 | *Different stages of the contest from start to the end of the match.* |
 
-| <table><tbody><tr><td style="width:400px">![screen-1.png](screenshots/screen-1.png)</td><td style="width:400px">![screen-2.png](screenshots/screen-2.png)</td></tr><tr><td style="width:400px">![screen-3.png](screenshots/screen-3.png)</td><td style="width:400px">![screen-4.png](screenshots/screen-4.png)</td></tr></tbody></table> |
+| <table><tbody><tr><td style="width:400px">![screen-1.png](screenshots/screen-1.png)</td><td style="width:400px">![screen-2.png](screenshots/screen-2.png)</td></tr><tr><td style="width:400px">![screen-3.png](screenshots/screen-3.png)</td><td style="width:400px">![screen-4.png](screenshots/screen-4.png)</td></tr><tr><td style="width:400px">![screen-5.png](screenshots/screen-5.png)</td><td style="width:400px">![screen-6.png](screenshots/screen-6.png)</td></tr></tbody></table> |
 |:--:|
 | *Same as previous but from the screen view.* |
 
