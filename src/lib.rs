@@ -33,6 +33,9 @@ pub struct Display {
 	
 	pub time_lbl: frame::Frame,
 	
+	pub kye_shi_lbl: frame::Frame,
+	pub kye_shi_time_lbl: frame::Frame,
+	
 	pub superiority_decision_lbl: frame::Frame,
 	
 	pub contest_winner_lbl: frame::Frame
@@ -52,6 +55,8 @@ pub struct Screen {
 	
 	pub time_lbl: frame::Frame,
 	
+	pub kye_shi_time_screen_lbl: frame::Frame,
+	
 	pub contest_winner_lbl: frame::Frame
 }
 
@@ -61,6 +66,8 @@ pub struct Controls {
 	pub si_jak_btn: button::Button,
 	pub kye_sok_btn: button::Button,
 	pub kal_yeo_btn: button::Button,
+	pub kye_shi_btn: button::Button,
+	pub kye_shi_cancel_btn: button::Button,
 	pub keu_man_btn: button::Button,
 	pub end_contest_btn: button::Button,
 	pub resume_contest_btn: button::Button,
@@ -118,10 +125,12 @@ pub struct Scoreboard {
     
     pub time: f32,
     pub blink_time: f32,
+    pub kye_shi_time: f32,
     
     pub started: bool,
     pub time_running: bool,
     pub rest: bool,
+    pub kye_shi_time_running: bool,
     pub keu_man_superiority_decision: bool,
     pub end_contest: bool,
     
@@ -186,6 +195,12 @@ impl Scoreboard {
 		self.time = self.round_time.min(0f32.max(self.time + var));
 		self.display.time_lbl.set_label(&format!("{}:{:02}", (self.time/60.).trunc(), (self.time%60.).trunc()));
 		self.screen.time_lbl.set_label(&format!("{}:{:02}", (self.time/60.).trunc(), (self.time%60.).trunc()));
+	}
+	
+	pub fn variate_kye_shi_time(&mut self, var: f32) {
+		self.kye_shi_time = 60f32.min(0f32.max(self.kye_shi_time + var));
+		self.display.kye_shi_time_lbl.set_label(&format!("{:}", self.kye_shi_time.trunc()));
+		self.screen.kye_shi_time_screen_lbl.set_label(&format!("{:}", self.kye_shi_time.trunc()));
 	}
 	
 	pub fn variate_cheong_score(&mut self, points: i8) {
@@ -333,6 +348,7 @@ impl Scoreboard {
 			self.controls.si_jak_btn.hide();
 			self.controls.kye_sok_btn.hide();
 			self.controls.kal_yeo_btn.hide();
+			self.controls.kye_shi_btn.hide();
 			self.controls.keu_man_btn.hide();
 			self.controls.resume_contest_btn.hide();
 			
@@ -440,6 +456,7 @@ impl Scoreboard {
 	pub fn end_contest(&mut self) {
 		self.controls.si_jak_btn.deactivate();
 		self.controls.kye_sok_btn.deactivate();
+		self.controls.kye_shi_btn.deactivate();
 		self.controls.keu_man_btn.deactivate();
 		self.hide_contest_controls();
 		self.show_superiority_decision_controls(true);
@@ -511,6 +528,12 @@ impl Scoreboard {
 		self.controls.hong_minus_momdollyeo_olgul_btn.show();
 	}
 	
+	pub fn show_kye_shi_time(&mut self) {
+		self.display.kye_shi_lbl.show();
+		self.display.kye_shi_time_lbl.show();
+		self.screen.kye_shi_time_screen_lbl.show();
+	}
+	
 	pub fn show_superiority_decision_controls(&mut self, end_contest: bool) {
 		if end_contest {
 			self.display.superiority_decision_lbl.set_label("Contest winner:");
@@ -552,6 +575,12 @@ impl Scoreboard {
 		self.controls.hong_minus_olgul_btn.hide();
 		self.controls.hong_plus_momdollyeo_olgul_btn.hide();
 		self.controls.hong_minus_momdollyeo_olgul_btn.hide();
+	}
+	
+	pub fn hide_kye_shi_time(&mut self) {
+		self.display.kye_shi_lbl.hide();
+		self.display.kye_shi_time_lbl.hide();
+		self.screen.kye_shi_time_screen_lbl.hide();
 	}
 	
 	pub fn hide_superiority_decision_controls(&mut self) {

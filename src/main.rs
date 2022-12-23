@@ -44,6 +44,9 @@ fn main() {
 		
 		time_lbl: time_lbl(screen_width, screen_height),
 		
+		kye_shi_lbl: kye_shi_lbl(screen_width, screen_height),
+		kye_shi_time_lbl: kye_shi_time_lbl(screen_width, screen_height),
+		
 		superiority_decision_lbl: superiority_decision_lbl(screen_width, screen_height),
 		
 		contest_winner_lbl: contest_winner_lbl(screen_width, screen_height)
@@ -64,6 +67,8 @@ fn main() {
 		si_jak_btn: si_jak_btn(screen_width, screen_height),
 		kye_sok_btn: kye_sok_btn(screen_width, screen_height),
 		kal_yeo_btn: kal_yeo_btn(screen_width, screen_height),
+		kye_shi_btn: kye_shi_btn(screen_width, screen_height),
+		kye_shi_cancel_btn: kye_shi_cancel_btn(screen_width, screen_height),
 		keu_man_btn: keu_man_btn(screen_width, screen_height),
 		end_contest_btn: end_contest_btn(screen_width, screen_height),
 		resume_contest_btn: resume_contest_btn(screen_width, screen_height),
@@ -126,6 +131,8 @@ fn main() {
 		
 		time_lbl: time_screen_lbl(screen_width, screen_height),
 		
+		kye_shi_time_screen_lbl: kye_shi_time_screen_lbl(screen_width, screen_height),
+		
 		contest_winner_lbl: contest_winner_screen_lbl(screen_width, screen_height)
 	};
 	
@@ -155,10 +162,12 @@ fn main() {
 		    
 		    time: 0f32,
 		    blink_time: 0f32,
+		    kye_shi_time: 0f32,
 		    
 		    started: false,
 		    time_running: false,
 		    rest: false,
+		    kye_shi_time_running: false,
 		    keu_man_superiority_decision: false,
 		    end_contest: false,
 		    
@@ -200,10 +209,15 @@ fn main() {
 			share.display.round_number_lbl.set_label_size(scale_size(150., w as f64, h as f64));
 			share.display.time_lbl.set_label_size(scale_size(215., w as f64, h as f64));
 			
+			share.display.kye_shi_lbl.set_label_size(scale_size(40., w as f64, h as f64));
+			share.display.kye_shi_time_lbl.set_label_size(scale_size(125., w as f64, h as f64));
+			
 			share.controls.new_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			share.controls.si_jak_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			share.controls.kye_sok_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			share.controls.kal_yeo_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.kye_shi_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.kye_shi_cancel_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			share.controls.keu_man_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			share.controls.end_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			share.controls.resume_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
@@ -265,6 +279,8 @@ fn main() {
 			share.screen.round_number_lbl.set_label_size(scale_size(175., w as f64, h as f64));
 			share.screen.time_lbl.set_label_size(scale_size(250., w as f64, h as f64));
 			
+			share.screen.kye_shi_time_screen_lbl.set_label_size(scale_size(400., w as f64, h as f64));
+			
 			share.screen.contest_winner_lbl.set_label_size(scale_size(100., w as f64, h as f64));
 		});
 	});
@@ -301,6 +317,7 @@ fn main() {
 					share.controls.si_jak_btn.show();
 					share.controls.si_jak_btn.activate();
 					share.controls.kal_yeo_btn.show();
+					share.controls.kye_shi_btn.show();
 					share.controls.keu_man_btn.show();
 					share.controls.end_contest_btn.show();
 					share.controls.end_contest_btn.activate();
@@ -381,6 +398,7 @@ fn main() {
 				share.screen.time_lbl.set_label_color(enums::Color::White);
 				kye_sok_btn.deactivate();
 				share.controls.kal_yeo_btn.activate();
+				share.controls.kye_shi_btn.deactivate();
 				share.controls.end_contest_btn.deactivate();
 					
 				share.controls.plus_1_second_btn.deactivate();
@@ -393,10 +411,38 @@ fn main() {
 			scoreboard_kal_yeo_btn.with_lock(|share| {
 				share.time_running = false;
 				share.blink_time = 0f32;
+				share.kye_shi_time = 60f32;
+				
 				kal_yeo_btn.deactivate();
+				share.controls.kye_shi_btn.activate();
+				
 				share.controls.plus_1_second_btn.activate();
 				share.controls.minus_1_second_btn.activate();
 				share.controls.kye_sok_btn.activate();
+				share.controls.end_contest_btn.activate();
+			});
+		});
+		
+		let scoreboard_kye_shi_btn = scoreboard.clone();
+		share.controls.kye_shi_btn.set_callback(move |_kye_shi_btn| {
+			scoreboard_kye_shi_btn.with_lock(|share| {
+				share.kye_shi_time_running = true;
+				
+				share.hide_contest_controls();
+				share.show_kye_shi_time();
+				share.controls.kye_shi_cancel_btn.show();
+			});
+		});
+		
+		let scoreboard_kye_shi_cancel_btn = scoreboard.clone();
+		share.controls.kye_shi_cancel_btn.set_callback(move |kye_shi_cancel_btn| {
+			scoreboard_kye_shi_cancel_btn.with_lock(|share| {
+				share.kye_shi_time_running = false;
+				share.kye_shi_time = 0f32;
+				
+				share.hide_kye_shi_time();
+				kye_shi_cancel_btn.hide();
+				share.show_contest_controls();
 				share.controls.end_contest_btn.activate();
 			});
 		});
@@ -748,6 +794,7 @@ fn main() {
 					
 					share.controls.kye_sok_btn.deactivate();
 					share.controls.kal_yeo_btn.deactivate();
+					share.controls.kye_shi_btn.deactivate();
 					share.controls.keu_man_btn.activate();
 					share.controls.end_contest_btn.activate();
 					
@@ -766,6 +813,17 @@ fn main() {
 						if !share.end_contest {
 							share.controls.kye_sok_btn.activate();
 							share.controls.keu_man_btn.deactivate();
+							share.controls.kye_shi_btn.activate();
+						}
+						if share.kye_shi_time_running {
+							share.controls.kye_sok_btn.deactivate();
+							share.controls.kye_shi_btn.deactivate();
+							share.controls.keu_man_btn.deactivate();
+							share.controls.end_contest_btn.deactivate();
+							share.variate_kye_shi_time(-0.1);
+						}
+						if share.kye_shi_time <= 0f32 {
+							share.controls.kye_shi_btn.deactivate();
 						}
 						if share.blink_time >= 0.5 {
 							if share.display.time_lbl.color() == enums::Color::White {
@@ -937,6 +995,25 @@ fn time_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
 	return time_lbl;
 }
 
+fn kye_shi_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
+	let mut kye_shi_lbl = frame::Frame::default()
+		.with_pos((screen_width * 1./3.) as i32, (screen_height * 4./8.) as i32)
+		.with_size((screen_width *  1./3.) as i32, (screen_height * 1./8.) as i32)
+		.with_label("Kye-shi");
+	kye_shi_lbl.set_frame(enums::FrameType::FlatBox);
+	kye_shi_lbl.hide();
+	return kye_shi_lbl;
+}
+
+fn kye_shi_time_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
+	let mut kye_shi_time_lbl = frame::Frame::default()
+		.with_pos((screen_width * 1./3.) as i32, (screen_height * 5./8.) as i32)
+		.with_size((screen_width *  1./3.) as i32, (screen_height * 1./8.) as i32);
+	kye_shi_time_lbl.set_frame(enums::FrameType::FlatBox);
+	kye_shi_time_lbl.hide();
+	return kye_shi_time_lbl;
+}
+
 fn hong_score_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
 	let mut hong_score_screen_lbl = frame::Frame::default()
     	.with_pos(0, (screen_height * 3./16.) as i32)
@@ -1030,6 +1107,17 @@ fn time_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
 	return time_screen_lbl;
 }
 
+fn kye_shi_time_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
+	let mut kye_shi_time_screen_lbl = frame::Frame::default()
+		.with_pos(0, (screen_height * 1./4.) as i32)
+		.with_size(screen_width as i32, (screen_height * 2./4.) as i32);
+	kye_shi_time_screen_lbl.set_frame(enums::FrameType::FlatBox);
+	kye_shi_time_screen_lbl.set_color(enums::Color::White);
+	kye_shi_time_screen_lbl.set_label_color(enums::Color::Black);
+	kye_shi_time_screen_lbl.hide();
+	return kye_shi_time_screen_lbl;
+}
+
 fn round_time_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
 	let mut round_time_lbl = frame::Frame::default()
 		.with_pos((screen_width * 4./9.) as i32, (screen_height * 28./48.) as i32)
@@ -1092,7 +1180,7 @@ fn new_contest_btn(screen_width: f64, screen_height: f64) -> button::Button {
 
 fn si_jak_btn(screen_width: f64, screen_height: f64) -> button::Button {
 	let mut si_jak_btn = button::Button::default()
-		.with_pos((screen_width * 1./9.) as i32, (screen_height * 14./16.) as i32)
+		.with_pos((screen_width * 2./27.) as i32, (screen_height * 14./16.) as i32)
 		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
 		.with_label("Shi-jak");
 	si_jak_btn.hide();
@@ -1101,7 +1189,7 @@ fn si_jak_btn(screen_width: f64, screen_height: f64) -> button::Button {
 
 fn kye_sok_btn(screen_width: f64, screen_height: f64) -> button::Button {
 	let mut kye_sok_btn = button::Button::default()
-		.with_pos((screen_width * 1./9.) as i32, (screen_height * 14./16.) as i32)
+		.with_pos((screen_width * 2./27.) as i32, (screen_height * 14./16.) as i32)
 		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
 		.with_label("Kye-sok");
 	kye_sok_btn.deactivate();
@@ -1111,7 +1199,7 @@ fn kye_sok_btn(screen_width: f64, screen_height: f64) -> button::Button {
 
 fn kal_yeo_btn(screen_width: f64, screen_height: f64) -> button::Button {
 	let mut kal_yeo_btn = button::Button::default()
-		.with_pos((screen_width * 3./9.) as i32, (screen_height * 14./16.) as i32)
+		.with_pos((screen_width * 7./27.) as i32, (screen_height * 14./16.) as i32)
 		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
 		.with_label("Kal-yeo");
 	kal_yeo_btn.deactivate();
@@ -1119,9 +1207,28 @@ fn kal_yeo_btn(screen_width: f64, screen_height: f64) -> button::Button {
 	return kal_yeo_btn;
 }
 
+fn kye_shi_btn(screen_width: f64, screen_height: f64) -> button::Button {
+	let mut kye_shi_btn = button::Button::default()
+		.with_pos((screen_width * 12./27.) as i32, (screen_height * 14./16.) as i32)
+		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
+		.with_label("Kye-shi");
+	kye_shi_btn.deactivate();
+	kye_shi_btn.hide();
+	return kye_shi_btn;
+}
+
+fn kye_shi_cancel_btn(screen_width: f64, screen_height: f64) -> button::Button {
+	let mut kye_shi_cancel_btn = button::Button::default()
+		.with_pos((screen_width * 12./27.) as i32, (screen_height * 25./32.) as i32)
+		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
+		.with_label("Cancel");
+	kye_shi_cancel_btn.hide();
+	return kye_shi_cancel_btn;
+}
+
 fn keu_man_btn(screen_width: f64, screen_height: f64) -> button::Button {
 	let mut keu_man_btn = button::Button::default()
-		.with_pos((screen_width * 5./9.) as i32, (screen_height * 14./16.) as i32)
+		.with_pos((screen_width * 17./27.) as i32, (screen_height * 14./16.) as i32)
 		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
 		.with_label("Keu-man");
 	keu_man_btn.deactivate();
@@ -1131,7 +1238,7 @@ fn keu_man_btn(screen_width: f64, screen_height: f64) -> button::Button {
 
 fn end_contest_btn(screen_width: f64, screen_height: f64) -> button::Button {
 	let mut end_contest_btn = button::Button::default()
-		.with_pos((screen_width * 7./9.) as i32, (screen_height * 14./16.) as i32)
+		.with_pos((screen_width * 22./27.) as i32, (screen_height * 14./16.) as i32)
 		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
 		.with_label("End contest");
 	end_contest_btn.hide();
@@ -1140,7 +1247,7 @@ fn end_contest_btn(screen_width: f64, screen_height: f64) -> button::Button {
 
 fn resume_contest_btn(screen_width: f64, screen_height: f64) -> button::Button {
 	let mut resume_contest_btn = button::Button::default()
-		.with_pos((screen_width * 7./9.) as i32, (screen_height * 14./16.) as i32)
+		.with_pos((screen_width * 22./27.) as i32, (screen_height * 14./16.) as i32)
 		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
 		.with_label("Resume");
 	resume_contest_btn.hide();
