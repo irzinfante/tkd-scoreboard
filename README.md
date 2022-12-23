@@ -5,7 +5,7 @@
 
 This project aims to provide a simple taekwondo scoreboard program for the best of 3 rounds kyorugi contest system, with the World Taekwondo competition rules in force as of the 1st of September of 2022.
 
-Executables for Windows and Unix-like systems can be downloaded from the [releases section of this repository](https://github.com/irzinfante/tkd-scoreboard/releases).
+Executables for Windows and GNU/Linux systems can be downloaded from the [releases section of this repository](https://github.com/irzinfante/tkd-scoreboard/releases).
 
 ## Linux desktop entry
 
