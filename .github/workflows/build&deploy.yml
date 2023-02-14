@@ -18,6 +18,8 @@ jobs:
     - name: Build Windows
       run: cargo build --release --target x86_64-pc-windows-gnu
     - name: Upload
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         gh release upload $GITHUB_REF_NAME target/release/tkd-scoreboard
         gh release upload $GITHUB_REF_NAME target/x86_64-pc-windows-gnu/release/tkd-scoreboard.exe
