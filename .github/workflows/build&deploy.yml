@@ -17,11 +17,7 @@ jobs:
       run: cargo build --release
     - name: Build Windows
       run: cargo build --release --target x86_64-pc-windows-gnu
-    - uses: jfrog/setup-jfrog-cli@v3
-      env:
-        JF_URL: https://irzinfante.jfrog.io
-        JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
-    - name: Deploy
+    - name: Upload
       run: |
-        jf rt upload --flat=true target/release/tkd-scoreboard tkd-scoreboard/$GITHUB_REF_NAME/
-        jf rt upload --flat=true target/x86_64-pc-windows-gnu/release/tkd-scoreboard.exe tkd-scoreboard/$GITHUB_REF_NAME/
+        gh release upload $GITHUB_REF_NAME target/release/tkd-scoreboard
+        gh release upload $GITHUB_REF_NAME target/x86_64-pc-windows-gnu/release/tkd-scoreboard.exe
