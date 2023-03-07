@@ -24,7 +24,6 @@ pub fn kye_shi_display_lbl(screen_width: f64, screen_height: f64) -> frame::Fram
 		.with_pos((screen_width * 1./3.) as i32, (screen_height * 4./8.) as i32)
 		.with_size((screen_width *  1./3.) as i32, (screen_height * 1./8.) as i32)
 		.with_label(KYE_SHI);
-	kye_shi_display_lbl.set_frame(FrameType::FlatBox);
 	kye_shi_display_lbl.hide();
 	return kye_shi_display_lbl;
 }
@@ -33,7 +32,6 @@ pub fn kye_shi_time_display_lbl(screen_width: f64, screen_height: f64) -> frame:
 	let mut kye_shi_time_display_lbl = frame::Frame::default()
 		.with_pos((screen_width * 1./3.) as i32, (screen_height * 5./8.) as i32)
 		.with_size((screen_width *  1./3.) as i32, (screen_height * 1./8.) as i32);
-	kye_shi_time_display_lbl.set_frame(FrameType::FlatBox);
 	kye_shi_time_display_lbl.hide();
 	return kye_shi_time_display_lbl;
 }

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use fltk::{prelude::*, frame, enums::FrameType};
+use fltk::{prelude::*, frame};
 use crate::constants::ROUND_WINNER;
 
 pub fn superiority_decision_display_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
@@ -24,7 +24,6 @@ pub fn superiority_decision_display_lbl(screen_width: f64, screen_height: f64) -
 		.with_pos((screen_width * 17./48.) as i32, (screen_height * 9./16.) as i32)
 		.with_size((screen_width * 7./24.) as i32, (screen_width * 1./24.) as i32)
 		.with_label(ROUND_WINNER);
-	superiority_decision_display_lbl.set_frame(FrameType::FlatBox);
 	superiority_decision_display_lbl.hide();
 	return superiority_decision_display_lbl;
 }

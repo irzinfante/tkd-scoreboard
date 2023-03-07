@@ -18,7 +18,8 @@
 
 use std::hash::{Hash, Hasher};
 use std::collections::hash_map::DefaultHasher;
-use crate::Scoreboard;
+use fltk::prelude::*;
+use crate::{Scoreboard, constants::CONTEST_NUMBER_SIGN};
 
 pub mod labels;
 
@@ -44,5 +45,20 @@ impl Scoreboard {
 			cheong_gam_jeon_count: self.cheong_gam_jeon_count,
 		    hong_gam_jeon_count: self.hong_gam_jeon_count
 		})
+	}
+	
+	pub fn show_contest_number(&mut self) {
+		let contest_number = self.settings.contest_number_input.value();
+		
+		self.display.contest_number_lbl.set_label(&format!("{}{}", CONTEST_NUMBER_SIGN, contest_number));
+		self.display.contest_number_lbl.show();
+		
+		self.screen.contest_number_lbl.set_label(&format!("{}{}", CONTEST_NUMBER_SIGN, contest_number));
+		self.screen.contest_number_lbl.show();
+	}
+	
+	pub fn hide_contest_number(&mut self) {
+		self.display.contest_number_lbl.hide();
+		self.screen.contest_number_lbl.hide();
 	}
 }

@@ -34,6 +34,9 @@ pub mod end_contest;
 pub mod contest_winner;
 
 pub struct Settings {
+	pub contest_number_lbl: frame::Frame,
+	pub contest_number_input: input::IntInput,
+	
 	pub round_time_lbl: frame::Frame,
 	pub round_time_input: input::IntInput,
 	pub round_time_seconds_lbl: frame::Frame,
@@ -65,7 +68,9 @@ pub struct Display {
 	pub superiority_decision_lbl: frame::Frame,
 	pub end_contest_lbl: frame::Frame,
 	
-	pub contest_winner_lbl: frame::Frame
+	pub contest_winner_lbl: frame::Frame,
+	
+	pub contest_number_lbl: frame::Frame
 }
 
 pub struct Screen {
@@ -84,7 +89,9 @@ pub struct Screen {
 	
 	pub kye_shi_time_lbl: frame::Frame,
 	
-	pub contest_winner_lbl: frame::Frame
+	pub contest_winner_lbl: frame::Frame,
+	
+	pub contest_number_lbl: frame::Frame
 }
 
 pub struct Controls {
@@ -205,8 +212,12 @@ impl Scoreboard {
 		self.time = self.rest_time;
 	}
 	
-	pub fn variate_time(&mut self, var: f32) {
+	pub fn variate_time_round(&mut self, var: f32) {
 		self.time = self.round_time.min(0f32.max(self.time + var));
+	}
+	
+	pub fn variate_time_rest(&mut self, var: f32) {
+		self.time = self.rest_time.min(0f32.max(self.time + var));
 	}
 	
 	pub fn variate_kye_shi_time(&mut self, var: f32) {

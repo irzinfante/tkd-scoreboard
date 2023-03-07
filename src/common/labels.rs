@@ -27,3 +27,11 @@ pub fn copyright(_screen_width: f64, screen_height: f64) -> frame::Frame {
 	copyright.set_label_size(10);
 	return copyright;
 }
+
+pub fn contest_number(screen_width: f64, screen_height: f64) -> frame::Frame {
+	let mut contest_number = frame::Frame::default()
+		.with_pos(screen_width as i32, screen_height as i32)
+		.with_align(Align::LeftBottom);
+	contest_number.set_label_size(15);
+	return contest_number;
+}

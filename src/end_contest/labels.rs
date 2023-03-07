@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use fltk::{prelude::*, frame, enums::FrameType};
+use fltk::{prelude::*, frame};
 use crate::constants::CONTEST_WINNER;
 
 pub fn end_contest_display_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
@@ -24,7 +24,6 @@ pub fn end_contest_display_lbl(screen_width: f64, screen_height: f64) -> frame::
 		.with_pos((screen_width * 17./48.) as i32, (screen_height * 9./16.) as i32)
 		.with_size((screen_width * 7./24.) as i32, (screen_width * 1./24.) as i32)
 		.with_label(CONTEST_WINNER);
-	end_contest_display_lbl.set_frame(FrameType::FlatBox);
 	end_contest_display_lbl.hide();
 	return end_contest_display_lbl;
 }

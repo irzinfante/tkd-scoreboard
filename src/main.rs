@@ -48,6 +48,9 @@ fn main() {
     main_win.set_icon(Some(image::SvgImage::from_data(ICON).unwrap()));
 	
 	let settings = Settings {
+		contest_number_lbl: contest_number_lbl(screen_width, screen_height),
+		contest_number_input: contest_number_input(screen_width, screen_height),
+		
 		round_time_lbl: round_time_lbl(screen_width, screen_height),
 		round_time_input: round_time_input(screen_width, screen_height),
 		round_time_seconds_lbl: round_time_seconds_lbl(screen_width, screen_height),
@@ -79,7 +82,9 @@ fn main() {
 		superiority_decision_lbl: superiority_decision_display_lbl(screen_width, screen_height),
 		end_contest_lbl: end_contest_display_lbl(screen_width, screen_height),
 		
-		contest_winner_lbl: contest_winner_display_lbl(screen_width, screen_height)
+		contest_winner_lbl: contest_winner_display_lbl(screen_width, screen_height),
+		
+		contest_number_lbl: contest_number(screen_width, screen_height)
 	};
 	
 	let controls = Controls {
@@ -157,7 +162,9 @@ fn main() {
 		
 		kye_shi_time_lbl: kye_shi_time_screen_lbl(screen_width, screen_height),
 		
-		contest_winner_lbl: contest_winner_screen_lbl(screen_width, screen_height)
+		contest_winner_lbl: contest_winner_screen_lbl(screen_width, screen_height),
+		
+		contest_number_lbl: contest_number(screen_width, screen_height)
 	};
 	
 	copyright(screen_width, screen_height);
@@ -216,9 +223,13 @@ fn main() {
 		let (x, y, d) = seung_display_lbl_dimensions(w as f64, h as f64);
 		
 		scoreboard_resize.with_lock(|share| {
+			share.settings.contest_number_lbl.set_label_size(scale_size(25., w as f64, h as f64));
+			share.settings.contest_number_input.set_text_size(scale_size(15., w as f64, h as f64));
 			share.settings.round_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
+			share.settings.round_time_input.set_text_size(scale_size(15., w as f64, h as f64));
 			share.settings.round_time_seconds_lbl.set_label_size(scale_size(15., w as f64, h as f64));
 			share.settings.rest_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
+			share.settings.rest_time_input.set_text_size(scale_size(15., w as f64, h as f64));
 			share.settings.rest_time_seconds_lbl.set_label_size(scale_size(15., w as f64, h as f64));
 			share.settings.new_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			
@@ -326,6 +337,8 @@ fn main() {
 				share.round_time = share.settings.round_time_input.value().parse::<f32>().unwrap();
 				share.rest_time = share.settings.rest_time_input.value().parse::<f32>().unwrap();
 				
+				share.show_contest_number();
+				
 				share.hide_settings();
 				share.change_state(State::CallContestants);
 				
@@ -386,6 +399,10 @@ fn main() {
 		let scoreboard_end_contest_btn = scoreboard.clone();
 		share.controls.end_contest_btn.set_callback(move |_end_contest_btn| {
 			scoreboard_end_contest_btn.with_lock(|share| {
+				match share.state {
+					State::SuperiorityDecision => share.hide_superiority_decision(),
+					_ => ()
+				}
 				share.change_state(State::EndContest);
 				share.update_controls();
 				share.show_end_contest();
@@ -611,7 +628,7 @@ fn main() {
 		let scoreboard_plus_one_second_btn = scoreboard.clone();
 		share.controls.plus_one_second_btn.set_callback(move |_plus_one_second_btn| {
 			scoreboard_plus_one_second_btn.with_lock(|share| {
-				share.variate_time(1f32);
+				share.variate_time_round(1f32);
 				share.update_controls();
 			});
 		});
@@ -619,7 +636,7 @@ fn main() {
 		let scoreboard_minus_one_second_btn = scoreboard.clone();
 		share.controls.minus_one_second_btn.set_callback(move |_minus_one_second_btn| {
 			scoreboard_minus_one_second_btn.with_lock(|share| {
-				share.variate_time(-1f32);
+				share.variate_time_round(-1f32);
 				share.update_controls();
 			});
 		});
@@ -675,6 +692,10 @@ fn main() {
 				share.hide_end_contest();
 				share.change_state(share.previous_state);
 				share.update_controls();
+				match share.state {
+					State::SuperiorityDecision => share.show_superiority_decision(),
+					_ => ()
+				}
 			});
 		});
 		
@@ -684,9 +705,15 @@ fn main() {
 				share.hide_contest_winner();
 				share.hide_display();
 				share.hide_screen();
+				share.hide_contest_number();
+				
 				share.clear_scoreboard();
+				
 				share.change_state(State::Settings);
+				share.update_controls();
 				share.show_settings();
+				
+				share.increment_contest_number_settings();
 			});
 		});
 	});
@@ -708,7 +735,7 @@ fn main() {
 				},
 				State::CallContestants => (),
 				State::Round => {
-					share.variate_time(-0.1);
+					share.variate_time_round(-0.1);
 					if share.is_keu_man_conditions() {
 						share.change_state(State::KeumanCondition);
 						share.update_controls();
@@ -743,13 +770,13 @@ fn main() {
 				},
 				State::SuperiorityDecision => (),
 				State::RestFirstPart => {
-					share.variate_time(-0.1);
+					share.variate_time_rest(-0.1);
 					share.is_after_5_seconds();
 					share.update_display();
 					share.update_screen();
 				},
 				State::RestSecondPart => {
-					share.variate_time(-0.1);
+					share.variate_time_rest(-0.1);
 					share.time_ends();
 					share.update_display();
 					share.update_screen();

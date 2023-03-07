@@ -19,7 +19,7 @@
 use fltk::{prelude::*, input};
 use crate::{
 	Scoreboard,
-	constants::{DEFAULT_ROUND_TIME, DEFAULT_REST_TIME}
+	constants::{DEFAULT_CONTEST_NUMBER, DEFAULT_ROUND_TIME, DEFAULT_REST_TIME}
 };
 
 pub mod labels;
@@ -40,6 +40,9 @@ fn valid_input(input: &input::IntInput) -> bool {
 
 impl Scoreboard {
 	pub fn show_settings(&mut self) {
+		self.settings.contest_number_lbl.show();
+		self.settings.contest_number_input.show();
+		
 		self.settings.round_time_lbl.show();
 		self.settings.round_time_input.show();
 		self.settings.round_time_seconds_lbl.show();
@@ -52,6 +55,9 @@ impl Scoreboard {
 	}
 	
 	pub fn hide_settings(&mut self) {
+		self.settings.contest_number_lbl.hide();
+		self.settings.contest_number_input.hide();
+		
 		self.settings.round_time_lbl.hide();
 		self.settings.round_time_input.hide();
 		self.settings.round_time_seconds_lbl.hide();
@@ -64,12 +70,30 @@ impl Scoreboard {
 	}
 	
 	pub fn set_default_settings(&mut self) {
+		self.settings.contest_number_input.set_value(DEFAULT_CONTEST_NUMBER);
 		self.settings.round_time_input.set_value(DEFAULT_ROUND_TIME);
 		self.settings.rest_time_input.set_value(DEFAULT_REST_TIME);
 	}
 	
+	pub fn increment_contest_number_settings(&mut self) {
+		match self.settings.contest_number_input.value().parse::<u8>() {
+			Ok(value) => {
+				if value < u8::MAX {
+					self.settings.contest_number_input.set_value(&(value  + 1).to_string());
+					return;
+				}
+			},
+			Err(_) => ()
+		}
+		self.settings.contest_number_input.set_value(DEFAULT_CONTEST_NUMBER);
+	}
+	
 	pub fn validate_settings(&mut self) {
-		if !(valid_input(&self.settings.round_time_input) && valid_input(&self.settings.rest_time_input)) {
+		if !(
+			valid_input(&self.settings.round_time_input) &&
+			valid_input(&self.settings.rest_time_input) &&
+			valid_input(&self.settings.contest_number_input)
+		) {
 			self.settings.new_contest_btn.deactivate();
 		} else {
 			self.settings.new_contest_btn.activate();
