@@ -24,6 +24,10 @@ Categories=Game;Utility;
 
 Put the Unix-like binary from releases downloads in `~/.local/bin` (remember to modify its permissions to allow execution) and the [icon file](assets/tkd-scoreboard.svg) in `~/.icons` to make them available for the desktop entry file.
 
+## Lifecycle flowchart
+
+![lifecycle.png](lifecycle.png)
+
 ## Screenshots
 
 | ![new-execution.png](screenshots/new-execution.png) |
@@ -40,7 +44,7 @@ Put the Unix-like binary from releases downloads in `~/.local/bin` (remember to 
 
 ## License
 
-Copyright (C) 2022 Iker Ruiz de Infante Gonzalez contact@irzinfante.eu
+Copyright (C) 2022-2023 Iker Ruiz de Infante Gonzalez contact@irzinfante.eu
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
