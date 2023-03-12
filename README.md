@@ -1,7 +1,10 @@
 # tkd-scoreboard
 
 [![rust](https://img.shields.io/badge/rust-2021-dea584)](https://doc.rust-lang.org/edition-guide/rust-2021/index.html)
-[![fltk-rs](https://img.shields.io/badge/fltk--rs-%5E1.2-6f71b5)](https://github.com/fltk-rs/fltk-rs)
+[![fltk-rs](https://img.shields.io/badge/fltk-%5E1.2-6f71b5)](https://crates.io/crates/fltk)
+[![fltk-rs](https://img.shields.io/badge/chrono-0.2.16-9978a3)](https://crates.io/crates/chrono)
+[![fltk-rs](https://img.shields.io/badge/directories-4.0.1-b57d96)](https://crates.io/crates/directories)
+[![fltk-rs](https://img.shields.io/badge/cacache-11.3.0-de8383)](https://crates.io/crates/cacache)
 
 This project aims to provide a simple taekwondo scoreboard program for the best of 3 rounds kyorugi contest system, with the World Taekwondo competition rules in force as of the 1st of September of 2022.
 

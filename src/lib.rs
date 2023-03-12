@@ -17,7 +17,7 @@
  */
 
 use std::sync::{Arc, Mutex};
-use fltk::{prelude::*, frame, input, button};
+use fltk::{prelude::*, frame, input, button, group};
 use enums::{State, Winner};
 use constants::{REST, ROUND};
 
@@ -32,6 +32,7 @@ pub mod medical_timeout;
 pub mod superiority_decision;
 pub mod end_contest;
 pub mod contest_winner;
+pub mod data;
 
 pub struct Settings {
 	pub contest_number_lbl: frame::Frame,
@@ -45,7 +46,13 @@ pub struct Settings {
 	pub rest_time_input: input::IntInput,
 	pub rest_time_seconds_lbl: frame::Frame,
 	
-	pub new_contest_btn: button::Button
+	pub new_contest_btn: button::Button,
+	
+	pub vertical_separator_lbl: frame::Frame,
+	
+	pub data_scroll: group::Scroll,
+	pub export_data_btn: button::Button,
+	pub delete_data_btn: button::Button
 }
 
 pub struct Display {
@@ -143,11 +150,29 @@ pub struct Controls {
 	pub clear_scoreboard_btn: button::Button
 }
 
+pub struct Data {
+	pub contest_id: String,
+	
+	pub contest_number: String,
+	pub round_time: String,
+	pub rest_time: String,
+	
+	pub cheong_score: [String; 3],
+	pub cheong_gamjeon: [String; 3],
+	pub hong_score: [String; 3],
+	pub hong_gamjeon: [String; 3],
+	pub round_winner: [String; 3],
+	
+	pub contest_winner: String
+}
+
 pub struct Scoreboard {
 	pub settings: Settings,
 	pub display: Display,
 	pub screen: Screen,
 	pub controls: Controls,
+	
+	pub data: Data,
 	
 	pub state: State,
 	pub previous_state: State,
@@ -353,15 +378,21 @@ impl Scoreboard {
 			}
 		}
 		if cheong_wins_count >= 2 {
+			self.save_round_data();
+			self.save_contest_winner_data(Winner::Cheong);
 			self.change_state(State::ContestWinner);
 			self.update_controls();
 			self.show_contest_winner(Winner::Cheong);
+			self.write_data();
 			return;
 		}
 		if hong_wins_count >= 2 {
+			self.save_round_data();
+			self.save_contest_winner_data(Winner::Hong);
 			self.change_state(State::ContestWinner);
 			self.update_controls();
 			self.show_contest_winner(Winner::Hong);
+			self.write_data();
 			return;
 		}
 		
@@ -370,6 +401,7 @@ impl Scoreboard {
 		
 		if self.is_after_reevaluation {
 			self.is_after_reevaluation = false;
+			self.save_round_data();
 			self.clear_punctuation();
 			self.change_state(State::RestSecondPart);
 			self.update_controls();
@@ -389,6 +421,7 @@ impl Scoreboard {
 				self.hide_round_winner_screen();
 				self.decide_round_winner();
 			} else {
+				self.save_round_data();
 				self.clear_punctuation();
 				self.change_state(State::RestSecondPart);
 				self.update_controls();
@@ -418,6 +451,20 @@ impl Scoreboard {
 	}
 	
 	pub fn clear_scoreboard(&mut self) {
+		self.data.contest_id = String::new();
+		
+		self.data.contest_number = String::new();
+		self.data.round_time = String::new();
+		self.data.rest_time = String::new();
+		
+		self.data.cheong_score = [(); 3].map(|_| String::from("-"));
+		self.data.cheong_gamjeon = [(); 3].map(|_| String::from("-"));
+		self.data.hong_score = [(); 3].map(|_| String::from("-"));
+		self.data.hong_gamjeon = [(); 3].map(|_| String::from("-"));
+		self.data.round_winner = [(); 3].map(|_| String::from("-"));
+		
+		self.data.contest_winner = String::new();
+		
 		self.round_time = 0f32;
 		self.rest_time = 0f32;
 		

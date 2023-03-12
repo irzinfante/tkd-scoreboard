@@ -52,6 +52,8 @@ impl Scoreboard {
 		self.settings.rest_time_seconds_lbl.show();
 		
 		self.settings.new_contest_btn.show();
+		
+		self.settings.vertical_separator_lbl.show();
 	}
 	
 	pub fn hide_settings(&mut self) {
@@ -67,6 +69,8 @@ impl Scoreboard {
 		self.settings.rest_time_seconds_lbl.hide();
 		
 		self.settings.new_contest_btn.hide();
+		
+		self.settings.vertical_separator_lbl.hide();
 	}
 	
 	pub fn set_default_settings(&mut self) {

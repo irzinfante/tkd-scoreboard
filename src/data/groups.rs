@@ -16,37 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use std::fmt;
+use fltk::{prelude::*, group};
 
-#[derive(Copy, Clone)]
-pub enum State {
-	None,
-	Settings,
-	CallContestants,
-	Round,
-	Timeout,
-	MedicalTimeout,
-	KeumanCondition,
-	SuperiorityDecision,
-	RestFirstPart,
-	RestSecondPart,
-	EndContest,
-	ContestWinner
-}
-
-#[derive(Copy, Clone)]
-pub enum Winner {
-	Cheong,
-	Hong,
-	None
-}
-
-impl fmt::Display for Winner {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Winner::Cheong => write!(f, "Cheong"),
-            Winner::Hong => write!(f, "Hong"),
-            Winner::None => write!(f, "-")
-        }
-    }
+ pub fn scroll_group(screen_width: f64, screen_height: f64) -> group::Scroll {
+	let scroll_group = group::Scroll::default()
+		.with_pos((screen_width * 17./40.) as i32, (screen_height * 1./7.) as i32)
+		.with_size((screen_width * 17./40.) as i32, (screen_height * 5./7.) as i32);
+	let mut vertical_pack = group::Pack::default_fill().with_type(group::PackType::Vertical);
+	vertical_pack.set_spacing(1);
+	scroll_group.end();
+	return scroll_group;
 }

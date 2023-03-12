@@ -20,7 +20,7 @@ use fltk::{prelude::*, input};
 
 pub fn contest_number_input(screen_width: f64, screen_height: f64) -> input::IntInput {
 	let mut contest_number_input = input::IntInput::default()
-		.with_pos((screen_width * 41./81.) as i32, (screen_height * 17./48.) as i32)
+		.with_pos((screen_width * 17./80.) as i32, (screen_height * 17./48.) as i32)
 		.with_size((screen_width * 2./81.) as i32, (screen_height * 1./32.) as i32);
 	contest_number_input.hide();
 	return contest_number_input;
@@ -28,7 +28,7 @@ pub fn contest_number_input(screen_width: f64, screen_height: f64) -> input::Int
 
 pub fn round_time_input(screen_width: f64, screen_height: f64) -> input::IntInput {
 	let mut round_time_input = input::IntInput::default()
-		.with_pos((screen_width * 41./81.) as i32, (screen_height * 20./48.) as i32)
+		.with_pos((screen_width * 17./80.) as i32, (screen_height * 20./48.) as i32)
 		.with_size((screen_width * 2./81.) as i32, (screen_height * 1./32.) as i32);
 	round_time_input.hide();
 	return round_time_input;
@@ -36,7 +36,7 @@ pub fn round_time_input(screen_width: f64, screen_height: f64) -> input::IntInpu
 
 pub fn rest_time_input(screen_width: f64, screen_height: f64) -> input::IntInput {
 	let mut rest_time_input = input::IntInput::default()
-		.with_pos((screen_width * 41./81.) as i32, (screen_height * 23./48.) as i32)
+		.with_pos((screen_width * 17./80.) as i32, (screen_height * 23./48.) as i32)
 		.with_size((screen_width * 2./81.) as i32, (screen_height * 1./32.) as i32);
 	rest_time_input.hide();
 	return rest_time_input;

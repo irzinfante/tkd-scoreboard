@@ -34,7 +34,8 @@ use crate::{
 	medical_timeout::{labels::*, buttons::*},
 	superiority_decision::{labels::*, buttons::*},
 	end_contest::{labels::*, buttons::*},
-	contest_winner::{labels::*, buttons::*}
+	contest_winner::{labels::*, buttons::*},
+	data::groups::*
 };
 
 fn main() {
@@ -59,7 +60,13 @@ fn main() {
 		rest_time_input: rest_time_input(screen_width, screen_height),
 		rest_time_seconds_lbl: rest_time_seconds_lbl(screen_width, screen_height),
 		
-		new_contest_btn: new_contest_btn(screen_width, screen_height)
+		new_contest_btn: new_contest_btn(screen_width, screen_height),
+		
+		vertical_separator_lbl: vertical_separator_lbl(screen_width, screen_height),
+		
+		data_scroll: scroll_group(screen_width, screen_height),
+		export_data_btn: export_data_btn(screen_width, screen_height),
+		delete_data_btn: delete_data_btn(screen_width, screen_height)
 	};
 	
 	let display = Display {
@@ -172,12 +179,30 @@ fn main() {
     screen_win.end();
     screen_win.show();
     
+    let data = Data {
+		contest_id: String::new(),
+		
+		contest_number: String::new(),
+		round_time: String::new(),
+		rest_time: String::new(),
+		
+		cheong_score: [(); 3].map(|_| String::from("-")),
+		cheong_gamjeon: [(); 3].map(|_| String::from("-")),
+		hong_score: [(); 3].map(|_| String::from("-")),
+		hong_gamjeon: [(); 3].map(|_| String::from("-")),
+		round_winner: [(); 3].map(|_| String::from("-")),
+		
+		contest_winner: Winner::None.to_string()
+	};
+    
     let scoreboard = ScoreboardHandle::new(
 		Scoreboard {
 			settings,
 			display,
 			screen,
 			controls,
+			
+			data,
 			
 			state: State::None,
 			previous_state: State::None,
@@ -224,14 +249,17 @@ fn main() {
 		
 		scoreboard_resize.with_lock(|share| {
 			share.settings.contest_number_lbl.set_label_size(scale_size(25., w as f64, h as f64));
-			share.settings.contest_number_input.set_text_size(scale_size(15., w as f64, h as f64));
+			share.settings.contest_number_input.set_text_size(scale_size(17., w as f64, h as f64));
 			share.settings.round_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
-			share.settings.round_time_input.set_text_size(scale_size(15., w as f64, h as f64));
-			share.settings.round_time_seconds_lbl.set_label_size(scale_size(15., w as f64, h as f64));
+			share.settings.round_time_input.set_text_size(scale_size(17., w as f64, h as f64));
+			share.settings.round_time_seconds_lbl.set_label_size(scale_size(17., w as f64, h as f64));
 			share.settings.rest_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
-			share.settings.rest_time_input.set_text_size(scale_size(15., w as f64, h as f64));
-			share.settings.rest_time_seconds_lbl.set_label_size(scale_size(15., w as f64, h as f64));
+			share.settings.rest_time_input.set_text_size(scale_size(17., w as f64, h as f64));
+			share.settings.rest_time_seconds_lbl.set_label_size(scale_size(17., w as f64, h as f64));
 			share.settings.new_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.settings.data_scroll.hscrollbar().deactivate();
+			share.settings.export_data_btn.set_label_size(scale_size(20., w as f64, h as f64));
+			share.settings.delete_data_btn.set_label_size(scale_size(20., w as f64, h as f64));
 			
 			share.display.cheong_score_lbl.set_label_size(scale_size(400., w as f64, h as f64));
 			share.display.cheong_gam_jeon_count_lbl.set_label_size(scale_size(90., w as f64, h as f64));
@@ -340,9 +368,11 @@ fn main() {
 				share.show_contest_number();
 				
 				share.hide_settings();
+				share.hide_data();
 				share.change_state(State::CallContestants);
 				
 				share.initialize_round();
+				share.initialize_contest_data();
 				
 				share.show_display();
 				share.update_display();
@@ -351,6 +381,21 @@ fn main() {
 				share.update_screen();
 				
 				share.update_controls();
+			});
+		});
+		
+		let scoreboard_export_data_btn = scoreboard.clone();
+		share.settings.export_data_btn.set_callback(move |_export_data_btn| {
+			scoreboard_export_data_btn.with_lock(|share| {
+				share.export_data();
+			});
+		});
+		
+		let scoreboard_delete_data_btn = scoreboard.clone();
+		share.settings.delete_data_btn.set_callback(move |_delete_data_btn| {
+			scoreboard_delete_data_btn.with_lock(|share| {
+				share.delete_data();
+				share.update_data();
 			});
 		});
 		
@@ -674,6 +719,9 @@ fn main() {
 				share.hide_end_contest();
 				share.change_state(State::ContestWinner);
 				share.show_contest_winner(Winner::Cheong);
+				share.save_round_data();
+				share.save_contest_winner_data(Winner::Cheong);
+				share.write_data();
 			});
 		});
 		
@@ -683,6 +731,9 @@ fn main() {
 				share.hide_end_contest();
 				share.change_state(State::ContestWinner);
 				share.show_contest_winner(Winner::Hong);
+				share.save_round_data();
+				share.save_contest_winner_data(Winner::Hong);
+				share.write_data();
 			});
 		});
 		
@@ -714,6 +765,7 @@ fn main() {
 				share.show_settings();
 				
 				share.increment_contest_number_settings();
+				share.update_data();
 			});
 		});
 	});
@@ -729,6 +781,7 @@ fn main() {
 					share.change_state(State::Settings);
 					share.show_settings();
 					share.set_default_settings();
+					share.update_data();
 				},
 				State::Settings => {
 					share.validate_settings();

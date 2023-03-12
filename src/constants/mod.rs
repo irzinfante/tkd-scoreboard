@@ -37,6 +37,13 @@ pub const MINUS_MOMDOLLYEO_OLGUL: &'static str = "<?xml version='1.0' encoding='
 // Copyright line
 pub const COPYRIGHT: &'static str = "Copyright (C) 2022-2023 Iker Ruiz de Infante Gonzalez <contact@@irzinfante.eu>";
 
+// Date formats
+pub const DATE_FORMAT_STR: &'static str = "%Y/%m/%d %H:%M:%S";
+pub const DAY_FORMAT_STR: &'static str = "%Y-%m-%d";
+
+// CSV header
+pub const CSV_HEADER: &'static str = "CONTEST ID,CONTEST NUMBER,ROUND TIME,REST TIME,ROUND 1 CHEONG SCORE,ROUND 1 CHEONG GAM-JEON,ROUND 1 HONG SCORE,ROUND 1 HONG GAM-JEON,ROUND 1 WINNER,ROUND 2 CHEONG SCORE,ROUND 2 CHEONG GAM-JEON,ROUND 2 HONG SCORE,ROUND 2 HONG GAM-JEON,ROUND 2 WINNER,ROUND 3 CHEONG SCORE,ROUND 3 CHEONG GAM-JEON,ROUND 3 HONG SCORE,ROUND 3 HONG GAM-JEON,ROUND 3 WINNER,CONTEST WINNER";
+
 // Literals by ascending alphabetical order
 pub const CANCEL: &'static str = "Cancel";
 pub const CHEONG: &'static str = "Cheong";
@@ -49,7 +56,9 @@ pub const CONTEST_WINNER: &'static str = "Contest winner:";
 pub const DEFAULT_CONTEST_NUMBER: &'static str = "1";
 pub const DEFAULT_REST_TIME: &'static str = "60";
 pub const DEFAULT_ROUND_TIME: &'static str = "120";
+pub const DELETE_DATA: &'static str = "Delete data";
 pub const END_CONTEST: &'static str = "End contest";
+pub const EXPORT_CSV: &'static str = "Export CSV";
 pub const HONG: &'static str = "Hong";
 pub const HONG_NL_SEUNG: &'static str = "HONG\nSEUNG";
 pub const HONG_SEUNG: &'static str = "HONG SEUNG";

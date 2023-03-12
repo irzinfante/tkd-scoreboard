@@ -16,24 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use fltk::{prelude::*, frame, enums::Align, enums::FrameType};
+use fltk::{prelude::*, frame, enums::Align, enums::Color, enums::FrameType};
 use crate::constants::{CONTEST_NUMBER, REST_TIME, ROUND_TIME, SECONDS};
 
 pub fn contest_number_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
 	let mut contest_number_lbl = frame::Frame::default()
-		.with_pos((screen_width * 1./2.) as i32, (screen_height * 17./48.) as i32)
+		.with_pos((screen_width * 1./5.) as i32, (screen_height * 17./48.) as i32)
 		.with_size(0, (screen_height * 1./32.) as i32)
 		.with_align(Align::Left)
 		.with_label(CONTEST_NUMBER);
 	contest_number_lbl.set_frame(FrameType::FlatBox);
-	contest_number_lbl.set_color(fltk::enums::Color::Red);
+	contest_number_lbl.set_color(Color::Red);
 	contest_number_lbl.hide();
 	return contest_number_lbl;
 }
 
 pub fn round_time_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
 	let mut round_time_lbl = frame::Frame::default()
-		.with_pos((screen_width * 1./2.) as i32, (screen_height * 20./48.) as i32)
+		.with_pos((screen_width * 1./5.) as i32, (screen_height * 20./48.) as i32)
 		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./32.) as i32)
 		.with_align(Align::Left)
 		.with_label(ROUND_TIME);
@@ -43,8 +43,8 @@ pub fn round_time_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
 
 pub fn round_time_seconds_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
 	let mut round_time_seconds_lbl = frame::Frame::default()
-		.with_pos((screen_width * 41./81.) as i32, (screen_height * 20./48.) as i32)
-		.with_size((screen_width * 2./81.) as i32, (screen_height * 1./32.) as i32)
+		.with_pos((screen_width * 17./80.) as i32, (screen_height * 20./48.) as i32)
+		.with_size((screen_width * 1./40.) as i32, (screen_height * 1./32.) as i32)
 		.with_align(Align::Right)
 		.with_label(SECONDS);
 	round_time_seconds_lbl.hide();
@@ -53,7 +53,7 @@ pub fn round_time_seconds_lbl(screen_width: f64, screen_height: f64) -> frame::F
 
 pub fn rest_time_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
 	let mut rest_time_lbl = frame::Frame::default()
-		.with_pos((screen_width * 1./2.) as i32, (screen_height * 23./48.) as i32)
+		.with_pos((screen_width * 1./5.) as i32, (screen_height * 23./48.) as i32)
 		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./32.) as i32)
 		.with_align(Align::Left)
 		.with_label(REST_TIME);
@@ -63,10 +63,19 @@ pub fn rest_time_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
 
 pub fn rest_time_seconds_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
 	let mut rest_time_seconds_lbl = frame::Frame::default()
-		.with_pos((screen_width * 41./81.) as i32, (screen_height * 23./48.) as i32)
-		.with_size((screen_width * 2./81.) as i32, (screen_height * 1./32.) as i32)
+		.with_pos((screen_width * 17./80.) as i32, (screen_height * 23./48.) as i32)
+		.with_size((screen_width * 1./40.) as i32, (screen_height * 1./32.) as i32)
 		.with_align(Align::Right)
 		.with_label(SECONDS);
 	rest_time_seconds_lbl.hide();
 	return rest_time_seconds_lbl;
+}
+
+pub fn vertical_separator_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
+	let mut vertical_separator_lbl = frame::Frame::default()
+		.with_pos((screen_width * 2./5.) as i32 - 1, (screen_height * 1./7.) as i32)
+		.with_size(2, (screen_height * 5./7.) as i32);
+	vertical_separator_lbl.set_frame(FrameType::FlatBox);
+	vertical_separator_lbl.set_color(Color::FrameDefault.darker());
+	return vertical_separator_lbl;
 }
