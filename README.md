@@ -33,15 +33,15 @@ Put the Unix-like binary from releases downloads in `~/.local/bin` (remember to 
 
 ## Screenshots
 
-| ![new-execution.png](screenshots/new-execution.png) |
+| ![new-execution.png](screenshots/display_Settings.png) |
 |:--:|
-| *On new program execution round time and rest time can be configured for the contest. Selected values remain the same in consecutive contests.* |
+| *Before each contest, contest settings can be configured. Data from already finalized contest can be exported and deleted..* |
 
-| <table><tbody><tr><td style="width:400px">![scoreboard-1.png](screenshots/scoreboard-1.png)</td><td style="width:400px">![scoreboard-2.png](screenshots/scoreboard-2.png)</td></tr><tr><td style="width:400px">![scoreboard-3.png](screenshots/scoreboard-3.png)</td><td style="width:400px">![scoreboard-4.png](screenshots/scoreboard-4.png)</td></tr><tr><td style="width:400px">![scoreboard-5.png](screenshots/scoreboard-5.png)</td><td style="width:400px">![scoreboard-6.png](screenshots/scoreboard-6.png)</td></tr></tbody></table> |
+| <table><tbody><tr><td style="width:400px">![display_CallContestants.png](screenshots/display_CallContestants.png)</td><td style="width:400px">![display_Round.png](screenshots/display_Round.png)</td></tr><tr><td style="width:400px">![display_Timeout.png](screenshots/display_Timeout.png)</td><td style="width:400px">![display_MedicalTimeout.png](screenshots/display_MedicalTimeout.png)</td></tr><tr><td style="width:400px">![display_KeumanCondition.png](screenshots/display_KeumanCondition.png)</td><td style="width:400px">![display_EndContest.png](screenshots/display_EndContest.png)</td></tr><tr><td style="width:400px">![display_RestFirstPart.png](screenshots/display_RestFirstPart.png)</td><td style="width:400px">![display_RestSecondPart.png](screenshots/display_RestSecondPart.png)</td></tr><tr><td style="width:400px">![display_SuperiorityDecision.png](screenshots/display_SuperiorityDecision.png)</td><td style="width:400px">![display_ContestWinner.png](screenshots/display_ContestWinner.png)</td></tr></tbody></table> |
 |:--:|
 | *Different stages of the contest from start to the end of the match.* |
 
-| <table><tbody><tr><td style="width:400px">![screen-1.png](screenshots/screen-1.png)</td><td style="width:400px">![screen-2.png](screenshots/screen-2.png)</td></tr><tr><td style="width:400px">![screen-3.png](screenshots/screen-3.png)</td><td style="width:400px">![screen-4.png](screenshots/screen-4.png)</td></tr><tr><td style="width:400px">![screen-5.png](screenshots/screen-5.png)</td><td style="width:400px">![screen-6.png](screenshots/screen-6.png)</td></tr></tbody></table> |
+| <table><tbody><tr><td style="width:400px">![screen_CallContestants.png](screenshots/screen_CallContestants.png)</td><td style="width:400px">![screen_Round.png](screenshots/screen_Round.png)</td></tr><tr><td style="width:400px">![screen_Timeout.png](screenshots/screen_Timeout.png)</td><td style="width:400px">![screen_MedicalTimeout.png](screenshots/screen_MedicalTimeout.png)</td></tr><tr><td style="width:400px">![screen_KeumanCondition.png](screenshots/screen_KeumanCondition.png)</td><td style="width:400px">![screen_EndContest.png](screenshots/screen_EndContest.png)</td></tr><tr><td style="width:400px">![screen_RestFirstPart.png](screenshots/screen_RestFirstPart.png)</td><td style="width:400px">![screen_RestSecondPart.png](screenshots/screen_RestSecondPart.png)</td></tr><tr><td style="width:400px">![screen_SuperiorityDecision.png](screenshots/screen_SuperiorityDecision.png)</td><td style="width:400px">![screen_ContestWinner.png](screenshots/display_ContestWinner.png)</td></tr></tbody></table> |
 |:--:|
 | *Same as previous but from the screen view.* |
 
