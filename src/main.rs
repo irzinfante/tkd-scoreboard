@@ -1,6 +1,6 @@
 /**
  * Scoreboard program for taekwondo competition
- * Copyright (C) 2022 Iker Ruiz de Infante Gonzalez <contact@irzinfante.eu>
+ * Copyright (C) 2022-2023 Iker Ruiz de Infante Gonzalez <contact@irzinfante.eu>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use fltk::{prelude::*, *};
-use tkd_scoreboard::*;
 use std::{thread, time::Duration};
+use fltk::{prelude::*, app, window, image};
+use tkd_scoreboard::*;
+use crate::{
+	constants::{
+		TKD_SCOREBOARD_SCOREBOARD, ICON, TKD_SCOREBOARD_SCREEN,
+		PLUS_JIRUGI, PLUS_MOMTONG, PLUS_MOMDOLLYEO_MOMTONG, PLUS_OLGUL, PLUS_MOMDOLLYEO_OLGUL,
+		MINUS_JIRUGI, MINUS_MOMTONG, MINUS_MOMDOLLYEO_MOMTONG, MINUS_OLGUL, MINUS_MOMDOLLYEO_OLGUL
+	},
+	enums::{State, Winner},
+	common::{*, labels::*},
+	settings::{labels::*, inputs::*, buttons::*},
+	display::{*, labels::*},
+	screen::{*, labels::*},
+	controls::buttons::*,
+	medical_timeout::{labels::*, buttons::*},
+	superiority_decision::{labels::*, buttons::*},
+	end_contest::{labels::*, buttons::*},
+	contest_winner::{labels::*, buttons::*},
+	data::groups::*
+};
 
 fn main() {
     let app = app::App::default();
@@ -26,45 +44,58 @@ fn main() {
     
     let mut main_win = window::Window::default()
     	.with_size(screen_width as i32, screen_height as i32)
-    	.with_label("TKD Scoreboard - Scoreboard");
+    	.with_label(TKD_SCOREBOARD_SCOREBOARD);
     main_win.make_resizable(true);
     main_win.set_icon(Some(image::SvgImage::from_data(ICON).unwrap()));
 	
-	let display = Display {
-		cheong_score_lbl: cheong_score_lbl(screen_width, screen_height),
-		cheong_gam_jeon_count_lbl: cheong_gam_jeon_count_lbl(screen_width, screen_height),
-		cheong_seung_lbl: cheong_seung_lbl(),
+	let settings = Settings {
+		contest_number_lbl: contest_number_lbl(screen_width, screen_height),
+		contest_number_input: contest_number_input(screen_width, screen_height),
 		
-		hong_score_lbl: hong_score_lbl(screen_width, screen_height),
-		hong_gam_jeon_count_lbl: hong_gam_jeon_count_lbl(screen_width, screen_height),
-		hong_seung_lbl: hong_seung_lbl(),
+		round_time_lbl: round_time_lbl(screen_width, screen_height),
+		round_time_input: round_time_input(screen_width, screen_height),
+		round_time_seconds_lbl: round_time_seconds_lbl(screen_width, screen_height),
 		
-		round_rest_lbl: round_rest_lbl(screen_width, screen_height),
-		round_number_lbl: round_number_lbl(screen_width, screen_height),
+		rest_time_lbl: rest_time_lbl(screen_width, screen_height),
+		rest_time_input: rest_time_input(screen_width, screen_height),
+		rest_time_seconds_lbl: rest_time_seconds_lbl(screen_width, screen_height),
 		
-		time_lbl: time_lbl(screen_width, screen_height),
-		
-		kye_shi_lbl: kye_shi_lbl(screen_width, screen_height),
-		kye_shi_time_lbl: kye_shi_time_lbl(screen_width, screen_height),
-		
-		superiority_decision_lbl: superiority_decision_lbl(screen_width, screen_height),
-		
-		contest_winner_lbl: contest_winner_lbl(screen_width, screen_height)
-	};
-	
-	let mut input_group = group::Group::default().with_size(screen_width as i32, screen_height as i32);
-	let mut rount_time_lbl = round_time_lbl(screen_width, screen_height);
-	let round_time_input = round_time_input(screen_width, screen_height);
-	let mut round_time_seconds_lbl = round_time_seconds_lbl(screen_width, screen_height);
-	let mut rest_time_lbl = rest_time_lbl(screen_width, screen_height);
-	let rest_time_input = rest_time_input(screen_width, screen_height);
-	let mut rest_time_seconds_lbl = rest_time_seconds_lbl(screen_width, screen_height);
-	input_group.end();
-	
-	let controls = Controls {
 		new_contest_btn: new_contest_btn(screen_width, screen_height),
 		
-		si_jak_btn: si_jak_btn(screen_width, screen_height),
+		vertical_separator_lbl: vertical_separator_lbl(screen_width, screen_height),
+		
+		data_scroll: scroll_group(screen_width, screen_height),
+		export_data_btn: export_data_btn(screen_width, screen_height),
+		delete_data_btn: delete_data_btn(screen_width, screen_height)
+	};
+	
+	let display = Display {
+		cheong_score_lbl: cheong_score_display_lbl(screen_width, screen_height),
+		cheong_gam_jeon_count_lbl: cheong_gam_jeon_count_display_lbl(screen_width, screen_height),
+		cheong_seung_lbl: cheong_seung_display_lbl(),
+		
+		hong_score_lbl: hong_score_display_lbl(screen_width, screen_height),
+		hong_gam_jeon_count_lbl: hong_gam_jeon_count_display_lbl(screen_width, screen_height),
+		hong_seung_lbl: hong_seung_display_lbl(),
+		
+		round_rest_lbl: round_rest_display_lbl(screen_width, screen_height),
+		round_number_lbl: round_number_display_lbl(screen_width, screen_height),
+		
+		time_lbl: time_display_lbl(screen_width, screen_height),
+		
+		kye_shi_lbl: kye_shi_display_lbl(screen_width, screen_height),
+		kye_shi_time_lbl: kye_shi_time_display_lbl(screen_width, screen_height),
+		
+		superiority_decision_lbl: superiority_decision_display_lbl(screen_width, screen_height),
+		end_contest_lbl: end_contest_display_lbl(screen_width, screen_height),
+		
+		contest_winner_lbl: contest_winner_display_lbl(screen_width, screen_height),
+		
+		contest_number_lbl: contest_number(screen_width, screen_height)
+	};
+	
+	let controls = Controls {
+		shi_jak_btn: shi_jak_btn(screen_width, screen_height),
 		kye_sok_btn: kye_sok_btn(screen_width, screen_height),
 		kal_yeo_btn: kal_yeo_btn(screen_width, screen_height),
 		kye_shi_btn: kye_shi_btn(screen_width, screen_height),
@@ -86,9 +117,6 @@ fn main() {
 		cheong_plus_gam_jeon_btn: cheong_plus_gam_jeon_btn(screen_width, screen_height),
 		cheong_minus_gam_jeon_btn: cheong_minus_gam_jeon_btn(screen_width, screen_height),
 		
-		plus_1_second_btn: plus_1_second_btn(screen_width, screen_height),
-		minus_1_second_btn: minus_1_second_btn(screen_width, screen_height),
-		
 		hong_plus_gam_jeon_btn: hong_plus_gam_jeon_btn(screen_width, screen_height),
 		hong_minus_gam_jeon_btn: hong_minus_gam_jeon_btn(screen_width, screen_height),
 		hong_plus_jirugi_btn: hong_plus_jirugi_btn(screen_width, screen_height),
@@ -102,8 +130,16 @@ fn main() {
 		hong_plus_momdollyeo_olgul_btn: hong_plus_momdollyeo_olgul_btn(screen_width, screen_height),
 		hong_minus_momdollyeo_olgul_btn: hong_minus_momdollyeo_olgul_btn(screen_width, screen_height),
 		
+		plus_one_second_btn: plus_one_second_btn(screen_width, screen_height),
+		minus_one_second_btn: minus_one_second_btn(screen_width, screen_height),
+		
 		cheong_superiority_decision_btn: cheong_superiority_decision_btn(screen_width, screen_height),
-		hong_superiority_decision_btn: hong_superiority_decision_btn(screen_width, screen_height)
+		hong_superiority_decision_btn: hong_superiority_decision_btn(screen_width, screen_height),
+		
+		cheong_end_contest_btn: cheong_end_contest_btn(screen_width, screen_height),
+		hong_end_contest_btn: hong_end_contest_btn(screen_width, screen_height),
+		
+		clear_scoreboard_btn: clear_scoreboard_btn(screen_width, screen_height)
 	};
 	
 	copyright(screen_width, screen_height);
@@ -113,7 +149,7 @@ fn main() {
     
     let mut screen_win = window::Window::default()
     	.with_size(screen_width as i32, screen_height as i32)
-    	.with_label("TKD Scoreboard - Screen");
+    	.with_label(TKD_SCOREBOARD_SCREEN);
     screen_win.make_resizable(true);
     screen_win.set_icon(Some(image::SvgImage::from_data(ICON).unwrap()));
     
@@ -131,9 +167,11 @@ fn main() {
 		
 		time_lbl: time_screen_lbl(screen_width, screen_height),
 		
-		kye_shi_time_screen_lbl: kye_shi_time_screen_lbl(screen_width, screen_height),
+		kye_shi_time_lbl: kye_shi_time_screen_lbl(screen_width, screen_height),
 		
-		contest_winner_lbl: contest_winner_screen_lbl(screen_width, screen_height)
+		contest_winner_lbl: contest_winner_screen_lbl(screen_width, screen_height),
+		
+		contest_number_lbl: contest_number(screen_width, screen_height)
 	};
 	
 	copyright(screen_width, screen_height);
@@ -141,59 +179,87 @@ fn main() {
     screen_win.end();
     screen_win.show();
     
+    let data = Data {
+		contest_id: String::new(),
+		
+		contest_number: String::new(),
+		round_time: String::new(),
+		rest_time: String::new(),
+		
+		cheong_score: [(); 3].map(|_| String::from("-")),
+		cheong_gamjeon: [(); 3].map(|_| String::from("-")),
+		hong_score: [(); 3].map(|_| String::from("-")),
+		hong_gamjeon: [(); 3].map(|_| String::from("-")),
+		round_winner: [(); 3].map(|_| String::from("-")),
+		
+		contest_winner: Winner::None.to_string()
+	};
+    
     let scoreboard = ScoreboardHandle::new(
 		Scoreboard {
+			settings,
 			display,
 			screen,
 			controls,
 			
+			data,
+			
+			state: State::None,
+			previous_state: State::None,
+			
 			round_time: 0f32,
 			rest_time: 0f32,
 			
-		    cheong_score: 0,
-		    cheong_gam_jeon_count: 0,
-		    
+			cheong_score: 0,
+			cheong_gam_jeon_count: 0,
+			
 			hong_score: 0,
 			hong_gam_jeon_count: 0,
-		    
-		    round_number: 0,
-		    round_winner: [Winner::None; 3],
-		    reevaluate: false,
-		    
-		    time: 0f32,
-		    blink_time: 0f32,
-		    kye_shi_time: 0f32,
-		    
-		    started: false,
-		    time_running: false,
-		    rest: false,
-		    kye_shi_time_running: false,
-		    keu_man_superiority_decision: false,
-		    end_contest: false,
-		    
-		    cheong_jirugi_count: 0,
-		    cheong_momtong_count: 0,
-		    cheong_momdollyeo_momtong_count: 0,
-		    cheong_olgul_count: 0,
-		    cheong_momdollyeo_olgul_count: 0,
-		    
-		    hong_jirugi_count: 0,
-		    hong_momtong_count: 0,
-		    hong_momdollyeo_momtong_count: 0,
-		    hong_olgul_count: 0,
-		    hong_momdollyeo_olgul_count: 0
+			
+			gam_jeons_hash: 0,
+			
+			round_number: 0,
+			round_winner: [Winner::None; 3],
+			is_after_reevaluation: false,
+			
+			time: 0f32,
+			
+			blink_time: 0f32,
+			blink: false,
+			
+			kye_shi_time: 0f32,
+			
+			cheong_jirugi_count: 0,
+			cheong_momtong_count: 0,
+			cheong_momdollyeo_momtong_count: 0,
+			cheong_olgul_count: 0,
+			cheong_momdollyeo_olgul_count: 0,
+			
+			hong_jirugi_count: 0,
+			hong_momtong_count: 0,
+			hong_momdollyeo_momtong_count: 0,
+			hong_olgul_count: 0,
+			hong_momdollyeo_olgul_count: 0
 		}
 	);	
     
     let scoreboard_resize = scoreboard.clone();
     main_win.resize_callback(move |_win, _x, _y, w, h| {
-		let (x, y, d) = seung_lbl_dimensions(w as f64, h as f64);
+		let (x, y, d) = seung_display_lbl_dimensions(w as f64, h as f64);
 		
 		scoreboard_resize.with_lock(|share| {
-			rount_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
-			round_time_seconds_lbl.set_label_size(scale_size(15., w as f64, h as f64));
-			rest_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
-			rest_time_seconds_lbl.set_label_size(scale_size(15., w as f64, h as f64));
+			share.settings.contest_number_lbl.set_label_size(scale_size(25., w as f64, h as f64));
+			share.settings.contest_number_input.set_text_size(scale_size(17., w as f64, h as f64));
+			share.settings.round_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
+			share.settings.round_time_input.set_text_size(scale_size(17., w as f64, h as f64));
+			share.settings.round_time_seconds_lbl.set_label_size(scale_size(17., w as f64, h as f64));
+			share.settings.rest_time_lbl.set_label_size(scale_size(25., w as f64, h as f64));
+			share.settings.rest_time_input.set_text_size(scale_size(17., w as f64, h as f64));
+			share.settings.rest_time_seconds_lbl.set_label_size(scale_size(17., w as f64, h as f64));
+			share.settings.new_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.settings.data_scroll.hscrollbar().deactivate();
+			share.settings.export_data_btn.set_label_size(scale_size(20., w as f64, h as f64));
+			share.settings.delete_data_btn.set_label_size(scale_size(20., w as f64, h as f64));
 			
 			share.display.cheong_score_lbl.set_label_size(scale_size(400., w as f64, h as f64));
 			share.display.cheong_gam_jeon_count_lbl.set_label_size(scale_size(90., w as f64, h as f64));
@@ -207,22 +273,31 @@ fn main() {
 			
 			share.display.round_rest_lbl.set_label_size(scale_size(40., w as f64, h as f64));
 			share.display.round_number_lbl.set_label_size(scale_size(150., w as f64, h as f64));
+			
 			share.display.time_lbl.set_label_size(scale_size(215., w as f64, h as f64));
 			
 			share.display.kye_shi_lbl.set_label_size(scale_size(40., w as f64, h as f64));
 			share.display.kye_shi_time_lbl.set_label_size(scale_size(125., w as f64, h as f64));
-			
-			share.controls.new_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.si_jak_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.kye_sok_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.kal_yeo_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.kye_shi_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			share.controls.kye_shi_cancel_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.keu_man_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.end_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			
+			share.display.superiority_decision_lbl.set_label_size(scale_size(40., w as f64, h as f64));
+			share.controls.cheong_superiority_decision_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.hong_superiority_decision_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			
+			share.display.end_contest_lbl.set_label_size(scale_size(40., w as f64, h as f64));
+			share.controls.cheong_end_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.hong_end_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			share.controls.resume_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			
 			share.display.contest_winner_lbl.set_label_size(scale_size(120., w as f64, h as f64));
+			share.controls.clear_scoreboard_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			
+			share.controls.shi_jak_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.kye_sok_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.kal_yeo_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.kye_shi_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.keu_man_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.end_contest_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			
 			share.controls.cheong_plus_jirugi_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_JIRUGI).unwrap()));
 			share.controls.cheong_minus_jirugi_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_JIRUGI).unwrap()));
@@ -237,9 +312,6 @@ fn main() {
 			share.controls.cheong_plus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			share.controls.cheong_minus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			
-			share.controls.plus_1_second_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.minus_1_second_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			
 			share.controls.hong_plus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			share.controls.hong_minus_gam_jeon_btn.set_label_size(scale_size(25., w as f64, h as f64));
 			share.controls.hong_plus_jirugi_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_JIRUGI).unwrap()));
@@ -253,9 +325,8 @@ fn main() {
 			share.controls.hong_plus_momdollyeo_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(PLUS_MOMDOLLYEO_OLGUL).unwrap()));
 			share.controls.hong_minus_momdollyeo_olgul_btn.set_image_scaled(Some(image::SvgImage::from_data(MINUS_MOMDOLLYEO_OLGUL).unwrap()));
 			
-			share.display.superiority_decision_lbl.set_label_size(scale_size(40., w as f64, h as f64));
-			share.controls.cheong_superiority_decision_btn.set_label_size(scale_size(25., w as f64, h as f64));
-			share.controls.hong_superiority_decision_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.plus_one_second_btn.set_label_size(scale_size(25., w as f64, h as f64));
+			share.controls.minus_one_second_btn.set_label_size(scale_size(25., w as f64, h as f64));
 		});
 	});
     main_win.resize(main_win.x(), main_win.y(), main_win.width(), main_win.height());
@@ -277,9 +348,10 @@ fn main() {
 			
 			share.screen.round_rest_lbl.set_label_size(scale_size(75., w as f64, h as f64));
 			share.screen.round_number_lbl.set_label_size(scale_size(175., w as f64, h as f64));
+			
 			share.screen.time_lbl.set_label_size(scale_size(250., w as f64, h as f64));
 			
-			share.screen.kye_shi_time_screen_lbl.set_label_size(scale_size(400., w as f64, h as f64));
+			share.screen.kye_shi_time_lbl.set_label_size(scale_size(400., w as f64, h as f64));
 			
 			share.screen.contest_winner_lbl.set_label_size(scale_size(100., w as f64, h as f64));
 		});
@@ -288,497 +360,413 @@ fn main() {
     
 	scoreboard.clone().with_lock(|share| {
 		let scoreboard_new_contest_btn = scoreboard.clone();
-		share.controls.new_contest_btn.set_callback(move |new_contest_btn| {
+		share.settings.new_contest_btn.set_callback(move |_new_contest_btn| {
 			scoreboard_new_contest_btn.with_lock(|share| {
-				if valid_input(&round_time_input) && valid_input(&rest_time_input) {
-					share.round_time = round_time_input.value().parse::<f32>().unwrap();
-					share.rest_time = rest_time_input.value().parse::<f32>().unwrap();
-					input_group.hide();
-					
-					share.display.time_lbl.set_color(enums::Color::Black);
-					share.display.time_lbl.set_label_color(enums::Color::White);
-					share.screen.time_lbl.set_color(enums::Color::Black);
-					share.screen.time_lbl.set_label_color(enums::Color::White);
-					share.variate_time(share.round_time);
-					
-					share.display.round_rest_lbl.set_label("ROUND");
-					share.screen.round_rest_lbl.set_label("ROUND");
-					share.new_round_display();
-					
-					share.display.cheong_seung_lbl.hide();
-					share.display.hong_seung_lbl.hide();
-					share.screen.cheong_seung_lbl.hide();
-					share.screen.hong_seung_lbl.hide();
-					
-					share.display.contest_winner_lbl.hide();
-					share.screen.contest_winner_lbl.hide();
-					new_contest_btn.hide();
-					
-					share.controls.si_jak_btn.show();
-					share.controls.si_jak_btn.activate();
-					share.controls.kal_yeo_btn.show();
-					share.controls.kye_shi_btn.show();
-					share.controls.keu_man_btn.show();
-					share.controls.end_contest_btn.show();
-					share.controls.end_contest_btn.activate();
-					
-					share.controls.cheong_plus_jirugi_btn.deactivate();
-					share.controls.cheong_plus_momtong_btn.deactivate();
-					share.controls.cheong_plus_momdollyeo_momtong_btn.deactivate();
-					share.controls.cheong_plus_olgul_btn.deactivate();
-					share.controls.cheong_plus_momdollyeo_olgul_btn.deactivate();
-					share.controls.cheong_plus_gam_jeon_btn.deactivate();
-					share.controls.cheong_minus_jirugi_btn.deactivate();
-					share.controls.cheong_minus_momtong_btn.deactivate();
-					share.controls.cheong_minus_momdollyeo_momtong_btn.deactivate();
-					share.controls.cheong_minus_olgul_btn.deactivate();
-					share.controls.cheong_minus_momdollyeo_olgul_btn.deactivate();
-					share.controls.cheong_minus_gam_jeon_btn.deactivate();
-					
-					share.controls.plus_1_second_btn.deactivate();
-					share.controls.minus_1_second_btn.deactivate();
-					
-					share.controls.hong_plus_gam_jeon_btn.deactivate();
-					share.controls.hong_plus_jirugi_btn.deactivate();
-					share.controls.hong_plus_momtong_btn.deactivate();
-					share.controls.hong_plus_momdollyeo_momtong_btn.deactivate();
-					share.controls.hong_plus_olgul_btn.deactivate();
-					share.controls.hong_plus_momdollyeo_olgul_btn.deactivate();
-					share.controls.hong_minus_gam_jeon_btn.deactivate();
-					share.controls.hong_minus_jirugi_btn.deactivate();
-					share.controls.hong_minus_momtong_btn.deactivate();
-					share.controls.hong_minus_momdollyeo_momtong_btn.deactivate();
-					share.controls.hong_minus_olgul_btn.deactivate();
-					share.controls.hong_minus_momdollyeo_olgul_btn.deactivate();
-					
-					share.show_screen_display();
-					share.show_contest_controls();
-				}
+				share.round_time = share.settings.round_time_input.value().parse::<f32>().unwrap();
+				share.rest_time = share.settings.rest_time_input.value().parse::<f32>().unwrap();
+				
+				share.show_contest_number();
+				
+				share.hide_settings();
+				share.hide_data();
+				share.change_state(State::CallContestants);
+				
+				share.initialize_round();
+				share.initialize_contest_data();
+				
+				share.show_display();
+				share.update_display();
+				
+				share.show_screen();
+				share.update_screen();
+				
+				share.update_controls();
 			});
 		});
 		
-		let scoreboard_si_jak_btn = scoreboard.clone();
-		share.controls.si_jak_btn.set_callback(move |si_jak_btn| {
-			scoreboard_si_jak_btn.with_lock(|share| {
-				share.started = true;
-				share.time_running = true;
-				
-				si_jak_btn.deactivate();
-				si_jak_btn.hide();
-				share.controls.kye_sok_btn.show();
-				share.controls.kal_yeo_btn.activate();
-				share.controls.end_contest_btn.deactivate();
-				
-				share.controls.cheong_plus_jirugi_btn.activate();
-				share.controls.cheong_plus_momtong_btn.activate();
-				share.controls.cheong_plus_momdollyeo_momtong_btn.activate();
-				share.controls.cheong_plus_olgul_btn.activate();
-				share.controls.cheong_plus_momdollyeo_olgul_btn.activate();
-				share.controls.cheong_plus_gam_jeon_btn.activate();
-				
-				share.controls.plus_1_second_btn.deactivate();
-				share.controls.minus_1_second_btn.deactivate();
-				
-				share.controls.hong_plus_gam_jeon_btn.activate();
-				share.controls.hong_plus_jirugi_btn.activate();
-				share.controls.hong_plus_momtong_btn.activate();
-				share.controls.hong_plus_momdollyeo_momtong_btn.activate();
-				share.controls.hong_plus_olgul_btn.activate();
-				share.controls.hong_plus_momdollyeo_olgul_btn.activate();
+		let scoreboard_export_data_btn = scoreboard.clone();
+		share.settings.export_data_btn.set_callback(move |_export_data_btn| {
+			scoreboard_export_data_btn.with_lock(|share| {
+				share.export_data();
+			});
+		});
+		
+		let scoreboard_delete_data_btn = scoreboard.clone();
+		share.settings.delete_data_btn.set_callback(move |_delete_data_btn| {
+			scoreboard_delete_data_btn.with_lock(|share| {
+				share.delete_data();
+				share.update_data();
+			});
+		});
+		
+		let scoreboard_shi_jak_btn = scoreboard.clone();
+		share.controls.shi_jak_btn.set_callback(move |_shi_jak_btn| {
+			scoreboard_shi_jak_btn.with_lock(|share| {
+				share.change_state(State::Round);
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_kye_sok_btn = scoreboard.clone();
-		share.controls.kye_sok_btn.set_callback(move |kye_sok_btn| {
+		share.controls.kye_sok_btn.set_callback(move |_kye_sok_btn| {
 			scoreboard_kye_sok_btn.with_lock(|share| {
-				share.time_running = true;
-				share.display.time_lbl.set_color(enums::Color::Black);
-				share.display.time_lbl.set_label_color(enums::Color::White);
-				share.screen.time_lbl.set_color(enums::Color::Black);
-				share.screen.time_lbl.set_label_color(enums::Color::White);
-				kye_sok_btn.deactivate();
-				share.controls.kal_yeo_btn.activate();
-				share.controls.kye_shi_btn.deactivate();
-				share.controls.end_contest_btn.deactivate();
-					
-				share.controls.plus_1_second_btn.deactivate();
-				share.controls.minus_1_second_btn.deactivate();
+				share.change_state(State::Round);
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_kal_yeo_btn = scoreboard.clone();
-		share.controls.kal_yeo_btn.set_callback(move |kal_yeo_btn| {
+		share.controls.kal_yeo_btn.set_callback(move |_kal_yeo_btn| {
 			scoreboard_kal_yeo_btn.with_lock(|share| {
-				share.time_running = false;
-				share.blink_time = 0f32;
-				share.kye_shi_time = 60f32;
-				
-				kal_yeo_btn.deactivate();
-				share.controls.kye_shi_btn.activate();
-				
-				share.controls.plus_1_second_btn.activate();
-				share.controls.minus_1_second_btn.activate();
-				share.controls.kye_sok_btn.activate();
-				share.controls.end_contest_btn.activate();
+				share.change_state(State::Timeout);
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_kye_shi_btn = scoreboard.clone();
 		share.controls.kye_shi_btn.set_callback(move |_kye_shi_btn| {
 			scoreboard_kye_shi_btn.with_lock(|share| {
-				share.kye_shi_time_running = true;
+				share.change_state(State::MedicalTimeout);
+				share.update_controls();
 				
-				share.hide_contest_controls();
-				share.show_kye_shi_time();
-				share.controls.kye_shi_cancel_btn.show();
-			});
-		});
-		
-		let scoreboard_kye_shi_cancel_btn = scoreboard.clone();
-		share.controls.kye_shi_cancel_btn.set_callback(move |kye_shi_cancel_btn| {
-			scoreboard_kye_shi_cancel_btn.with_lock(|share| {
-				share.kye_shi_time_running = false;
-				share.kye_shi_time = 0f32;
-				
-				share.hide_kye_shi_time();
-				kye_shi_cancel_btn.hide();
-				share.show_contest_controls();
-				share.controls.end_contest_btn.activate();
+				share.show_medical_timeout();
+				share.update_medical_timeout();
 			});
 		});
 		
 		let scoreboard_keu_man_btn = scoreboard.clone();
-		share.controls.keu_man_btn.set_callback(move |keu_man_btn| {
+		share.controls.keu_man_btn.set_callback(move |_keu_man_btn| {
 			scoreboard_keu_man_btn.with_lock(|share| {
-				let winner = share.round_winner();
-				if let Winner::None = winner {
-					share.hide_contest_controls();
-					share.started = false;
-					keu_man_btn.deactivate();
-					share.show_superiority_decision_controls(false);
-				} else {
-					share.decide_winner(winner);
-				}
+				share.decide_round_winner();
 			});
 		});
 		
 		let scoreboard_end_contest_btn = scoreboard.clone();
 		share.controls.end_contest_btn.set_callback(move |_end_contest_btn| {
 			scoreboard_end_contest_btn.with_lock(|share| {
-				share.end_contest();
-			});
-		});
-		
-		let scoreboard_resume_contest_btn = scoreboard.clone();
-		share.controls.resume_contest_btn.set_callback(move |resume_contest_btn| {
-			scoreboard_resume_contest_btn.with_lock(|share| {
-				if share.started && share.is_termination_condition() {
-					share.controls.keu_man_btn.activate();
-				} else if share.started && !share.keu_man_superiority_decision {
-					share.controls.kye_sok_btn.activate();
-				} else if share.rest {
-					share.time_running = true;
-				} else {
-					share.controls.si_jak_btn.activate();
+				match share.state {
+					State::SuperiorityDecision => share.hide_superiority_decision(),
+					_ => ()
 				}
-				if share.keu_man_superiority_decision {
-					share.show_superiority_decision_controls(false);
-				} else {
-					share.hide_superiority_decision_controls();
-					share.show_contest_controls();
-				}
-				share.end_contest = false;
-				resume_contest_btn.deactivate();
-				resume_contest_btn.hide();
-				share.controls.end_contest_btn.activate();
-				share.controls.end_contest_btn.show();
+				share.change_state(State::EndContest);
+				share.update_controls();
+				share.show_end_contest();
 			});
 		});
 		
 		let scoreboard_cheong_plus_jirugi_btn = scoreboard.clone();
 		share.controls.cheong_plus_jirugi_btn.set_callback(move |_cheong_plus_jirugi_btn| {
 			scoreboard_cheong_plus_jirugi_btn.with_lock(|share| {
-				share.variate_cheong_score(1);
+				share.cheong_score += 1;
 				share.cheong_jirugi_count += 1;
-				share.controls.cheong_minus_jirugi_btn.activate();
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_minus_jirugi_btn = scoreboard.clone();
-		share.controls.cheong_minus_jirugi_btn.set_callback(move |cheong_minus_jirugi_btn| {
+		share.controls.cheong_minus_jirugi_btn.set_callback(move |_cheong_minus_jirugi_btn| {
 			scoreboard_cheong_minus_jirugi_btn.with_lock(|share| {
-				share.variate_cheong_score(-1);
+				share.cheong_score -= 1;
 				share.cheong_jirugi_count -= 1;
-				if share.cheong_jirugi_count == 0 {
-					cheong_minus_jirugi_btn.deactivate();
-				}
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_plus_momtong_btn = scoreboard.clone();
 		share.controls.cheong_plus_momtong_btn.set_callback(move |_cheong_plus_momtong_btn| {
 			scoreboard_cheong_plus_momtong_btn.with_lock(|share| {
-				share.variate_cheong_score(2);
+				share.cheong_score += 2;
 				share.cheong_momtong_count += 1;
-				share.controls.cheong_minus_momtong_btn.activate();
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_minus_momtong_btn = scoreboard.clone();
-		share.controls.cheong_minus_momtong_btn.set_callback(move |cheong_minus_momtong_btn| {
+		share.controls.cheong_minus_momtong_btn.set_callback(move |_cheong_minus_momtong_btn| {
 			scoreboard_cheong_minus_momtong_btn.with_lock(|share| {
-				share.variate_cheong_score(-2);
+				share.cheong_score -= 2;
 				share.cheong_momtong_count -= 1;
-				if share.cheong_momtong_count == 0 {
-					cheong_minus_momtong_btn.deactivate();
-				}
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_plus_momdollyeo_momtong_btn = scoreboard.clone();
 		share.controls.cheong_plus_momdollyeo_momtong_btn.set_callback(move |_cheong_plus_momdollyeo_momtong_btn| {
 			scoreboard_cheong_plus_momdollyeo_momtong_btn.with_lock(|share| {
-				share.variate_cheong_score(4);
+				share.cheong_score += 4;
 				share.cheong_momdollyeo_momtong_count += 1;
-				share.controls.cheong_minus_momdollyeo_momtong_btn.activate();
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_minus_momdollyeo_momtong_btn = scoreboard.clone();
-		share.controls.cheong_minus_momdollyeo_momtong_btn.set_callback(move |cheong_minus_momdollyeo_momtong_btn| {
+		share.controls.cheong_minus_momdollyeo_momtong_btn.set_callback(move |_cheong_minus_momdollyeo_momtong_btn| {
 			scoreboard_cheong_minus_momdollyeo_momtong_btn.with_lock(|share| {
-				share.variate_cheong_score(-4);
+				share.cheong_score -= 4;
 				share.cheong_momdollyeo_momtong_count -= 1;
-				if share.cheong_momdollyeo_momtong_count == 0 {
-					cheong_minus_momdollyeo_momtong_btn.deactivate();
-				}
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_plus_olgul_btn = scoreboard.clone();
 		share.controls.cheong_plus_olgul_btn.set_callback(move |_cheong_plus_olgul_btn| {
 			scoreboard_cheong_plus_olgul_btn.with_lock(|share| {
-				share.variate_cheong_score(3);
+				share.cheong_score += 3;
 				share.cheong_olgul_count += 1;
-				share.controls.cheong_minus_olgul_btn.activate();
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_minus_olgul_btn = scoreboard.clone();
-		share.controls.cheong_minus_olgul_btn.set_callback(move |cheong_minus_olgul_btn| {
+		share.controls.cheong_minus_olgul_btn.set_callback(move |_cheong_minus_olgul_btn| {
 			scoreboard_cheong_minus_olgul_btn.with_lock(|share| {
-				share.variate_cheong_score(-3);
+				share.cheong_score -= 3;
 				share.cheong_olgul_count -= 1;
-				if share.cheong_olgul_count == 0 {
-					cheong_minus_olgul_btn.deactivate();
-				}
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_plus_momdollyeo_olgul_btn = scoreboard.clone();
 		share.controls.cheong_plus_momdollyeo_olgul_btn.set_callback(move |_cheong_plus_momdollyeo_olgul_btn| {
 			scoreboard_cheong_plus_momdollyeo_olgul_btn.with_lock(|share| {
-				share.variate_cheong_score(5);
+				share.cheong_score += 5;
 				share.cheong_momdollyeo_olgul_count += 1;
-				share.controls.cheong_minus_momdollyeo_olgul_btn.activate();
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_minus_momdollyeo_olgul_btn = scoreboard.clone();
-		share.controls.cheong_minus_momdollyeo_olgul_btn.set_callback(move |cheong_minus_momdollyeo_olgul_btn| {
+		share.controls.cheong_minus_momdollyeo_olgul_btn.set_callback(move |_cheong_minus_momdollyeo_olgul_btn| {
 			scoreboard_cheong_minus_momdollyeo_olgul_btn.with_lock(|share| {
-				share.variate_cheong_score(-5);
+				share.cheong_score -= 5;
 				share.cheong_momdollyeo_olgul_count -= 1;
-				if share.cheong_momdollyeo_olgul_count == 0 {
-					cheong_minus_momdollyeo_olgul_btn.deactivate();
-				}
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_plus_gam_jeon_btn = scoreboard.clone();
-		share.controls.cheong_plus_gam_jeon_btn.set_callback(move |cheong_plus_gam_jeon_btn| {
+		share.controls.cheong_plus_gam_jeon_btn.set_callback(move |_cheong_plus_gam_jeon_btn| {
 			scoreboard_cheong_plus_gam_jeon_btn.with_lock(|share| {
-				share.variate_cheong_gam_jeon_count(1);
-				share.variate_hong_score(1);
-				share.controls.cheong_minus_gam_jeon_btn.activate();
-				if share.rest {
-					share.reevaluate = true;
-				}
-				if share.cheong_gam_jeon_count > 4 {
-					cheong_plus_gam_jeon_btn.deactivate();
-				}
-				share.check_fifth_gam_jeon();
+				share.cheong_gam_jeon_count += 1;
+				share.hong_score += 1;
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_minus_gam_jeon_btn = scoreboard.clone();
-		share.controls.cheong_minus_gam_jeon_btn.set_callback(move |cheong_minus_gam_jeon_btn| {
+		share.controls.cheong_minus_gam_jeon_btn.set_callback(move |_cheong_minus_gam_jeon_btn| {
 			scoreboard_cheong_minus_gam_jeon_btn.with_lock(|share| {
-				share.variate_cheong_gam_jeon_count(-1);
-				share.variate_hong_score(-1);
-				share.controls.cheong_plus_gam_jeon_btn.activate();
-				if share.cheong_gam_jeon_count == 0 {
-					cheong_minus_gam_jeon_btn.deactivate();
-				}
-				share.check_fifth_gam_jeon();
-			});
-		});
-		
-		let scoreboard_plus_1_second_btn = scoreboard.clone();
-		share.controls.plus_1_second_btn.set_callback(move |_plus_1_second_btn| {
-			scoreboard_plus_1_second_btn.with_lock(|share| {
-				share.variate_time(1f32);
-			});
-		});
-		
-		let scoreboard_minus_1_second_btn = scoreboard.clone();
-		share.controls.minus_1_second_btn.set_callback(move |_minus_1_second_btn| {
-			scoreboard_minus_1_second_btn.with_lock(|share| {
-				share.variate_time(-1f32);
+				share.cheong_gam_jeon_count -= 1;
+				share.hong_score -= 1;
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_plus_gam_jeon_btn = scoreboard.clone();
-		share.controls.hong_plus_gam_jeon_btn.set_callback(move |hong_plus_gam_jeon_btn| {
+		share.controls.hong_plus_gam_jeon_btn.set_callback(move |_hong_plus_gam_jeon_btn| {
 			scoreboard_hong_plus_gam_jeon_btn.with_lock(|share| {
-				share.variate_hong_gam_jeon_count(1);
-				share.variate_cheong_score(1);
-				share.controls.hong_minus_gam_jeon_btn.activate();
-				if share.rest {
-					share.reevaluate = true;
-				}
-				if share.hong_gam_jeon_count > 4 {
-					hong_plus_gam_jeon_btn.deactivate();
-				}
-				share.check_fifth_gam_jeon();
+				share.hong_gam_jeon_count += 1;
+				share.cheong_score += 1;
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_minus_gam_jeon_btn = scoreboard.clone();
-		share.controls.hong_minus_gam_jeon_btn.set_callback(move |hong_minus_gam_jeon_btn| {
+		share.controls.hong_minus_gam_jeon_btn.set_callback(move |_hong_minus_gam_jeon_btn| {
 			scoreboard_hong_minus_gam_jeon_btn.with_lock(|share| {
-				share.variate_hong_gam_jeon_count(-1);
-				share.variate_cheong_score(-1);
-				share.controls.hong_plus_gam_jeon_btn.activate();
-				if share.hong_gam_jeon_count == 0 {
-					hong_minus_gam_jeon_btn.deactivate();
-				}
-				share.check_fifth_gam_jeon();
+				share.hong_gam_jeon_count -= 1;
+				share.cheong_score -= 1;
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_plus_jirugi_btn = scoreboard.clone();
 		share.controls.hong_plus_jirugi_btn.set_callback(move |_hong_plus_jirugi_btn| {
 			scoreboard_hong_plus_jirugi_btn.with_lock(|share| {
-				share.variate_hong_score(1);
+				share.hong_score += 1;
 				share.hong_jirugi_count += 1;
-				share.controls.hong_minus_jirugi_btn.activate();
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_minus_jirugi_btn = scoreboard.clone();
-		share.controls.hong_minus_jirugi_btn.set_callback(move |hong_minus_jirugi_btn| {
+		share.controls.hong_minus_jirugi_btn.set_callback(move |_hong_minus_jirugi_btn| {
 			scoreboard_hong_minus_jirugi_btn.with_lock(|share| {
-				share.variate_hong_score(-1);
+				share.hong_score -= 1;
 				share.hong_jirugi_count -= 1;
-				if share.hong_jirugi_count == 0 {
-					hong_minus_jirugi_btn.deactivate();
-				}
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_plus_momtong_btn = scoreboard.clone();
 		share.controls.hong_plus_momtong_btn.set_callback(move |_hong_plus_momtong_btn| {
 			scoreboard_hong_plus_momtong_btn.with_lock(|share| {
-				share.variate_hong_score(2);
+				share.hong_score += 2;
 				share.hong_momtong_count += 1;
-				share.controls.hong_minus_momtong_btn.activate();
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_minus_momtong_btn = scoreboard.clone();
-		share.controls.hong_minus_momtong_btn.set_callback(move |hong_minus_momtong_btn| {
+		share.controls.hong_minus_momtong_btn.set_callback(move |_hong_minus_momtong_btn| {
 			scoreboard_hong_minus_momtong_btn.with_lock(|share| {
-				share.variate_hong_score(-2);
+				share.hong_score -= 2;
 				share.hong_momtong_count -= 1;
-				if share.hong_momtong_count == 0 {
-					hong_minus_momtong_btn.deactivate();
-				}
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_plus_momdollyeo_momtong_btn = scoreboard.clone();
 		share.controls.hong_plus_momdollyeo_momtong_btn.set_callback(move |_hong_plus_momdollyeo_momtong_btn| {
 			scoreboard_hong_plus_momdollyeo_momtong_btn.with_lock(|share| {
-				share.variate_hong_score(4);
+				share.hong_score += 4;
 				share.hong_momdollyeo_momtong_count += 1;
-				share.controls.hong_minus_momdollyeo_momtong_btn.activate();
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_minus_momdollyeo_momtong_btn = scoreboard.clone();
-		share.controls.hong_minus_momdollyeo_momtong_btn.set_callback(move |hong_minus_momdollyeo_momtong_btn| {
+		share.controls.hong_minus_momdollyeo_momtong_btn.set_callback(move |_hong_minus_momdollyeo_momtong_btn| {
 			scoreboard_hong_minus_momdollyeo_momtong_btn.with_lock(|share| {
-				share.variate_hong_score(-4);
+				share.hong_score -= 4;
 				share.hong_momdollyeo_momtong_count -= 1;
-				if share.hong_momdollyeo_momtong_count == 0 {
-					hong_minus_momdollyeo_momtong_btn.deactivate();
-				}
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_plus_olgul_btn = scoreboard.clone();
 		share.controls.hong_plus_olgul_btn.set_callback(move |_hong_plus_olgul_btn| {
 			scoreboard_hong_plus_olgul_btn.with_lock(|share| {
-				share.variate_hong_score(3);
+				share.hong_score += 3;
 				share.hong_olgul_count += 1;
-				share.controls.hong_minus_olgul_btn.activate();
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_minus_olgul_btn = scoreboard.clone();
-		share.controls.hong_minus_olgul_btn.set_callback(move |hong_minus_olgul_btn| {
+		share.controls.hong_minus_olgul_btn.set_callback(move |_hong_minus_olgul_btn| {
 			scoreboard_hong_minus_olgul_btn.with_lock(|share| {
-				share.variate_hong_score(-3);
+				share.hong_score -= 3;
 				share.hong_olgul_count -= 1;
-				if share.hong_olgul_count == 0 {
-					hong_minus_olgul_btn.deactivate();
-				}
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_plus_momdollyeo_olgul_btn = scoreboard.clone();
 		share.controls.hong_plus_momdollyeo_olgul_btn.set_callback(move |_hong_plus_momdollyeo_olgul_btn| {
 			scoreboard_hong_plus_momdollyeo_olgul_btn.with_lock(|share| {
-				share.variate_hong_score(5);
+				share.hong_score += 5;
 				share.hong_momdollyeo_olgul_count += 1;
-				share.controls.hong_minus_momdollyeo_olgul_btn.activate();
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_hong_minus_momdollyeo_olgul_btn = scoreboard.clone();
-		share.controls.hong_minus_momdollyeo_olgul_btn.set_callback(move |hong_minus_momdollyeo_olgul_btn| {
+		share.controls.hong_minus_momdollyeo_olgul_btn.set_callback(move |_hong_minus_momdollyeo_olgul_btn| {
 			scoreboard_hong_minus_momdollyeo_olgul_btn.with_lock(|share| {
-				share.variate_hong_score(-5);
+				share.hong_score -= 5;
 				share.hong_momdollyeo_olgul_count -= 1;
-				if share.hong_momdollyeo_olgul_count == 0 {
-					hong_minus_momdollyeo_olgul_btn.deactivate();
-				}
+				share.update_controls();
+			});
+		});
+		
+		let scoreboard_plus_one_second_btn = scoreboard.clone();
+		share.controls.plus_one_second_btn.set_callback(move |_plus_one_second_btn| {
+			scoreboard_plus_one_second_btn.with_lock(|share| {
+				share.variate_time_round(1f32);
+				share.update_controls();
+			});
+		});
+		
+		let scoreboard_minus_one_second_btn = scoreboard.clone();
+		share.controls.minus_one_second_btn.set_callback(move |_minus_one_second_btn| {
+			scoreboard_minus_one_second_btn.with_lock(|share| {
+				share.variate_time_round(-1f32);
+				share.update_controls();
 			});
 		});
 		
 		let scoreboard_cheong_superiority_decision_btn = scoreboard.clone();
 		share.controls.cheong_superiority_decision_btn.set_callback(move |_cheong_superiority_decision_btn| {
 			scoreboard_cheong_superiority_decision_btn.with_lock(|share| {
-				share.decide_winner(Winner::Cheong);
-			})
+				share.hide_superiority_decision();
+				share.round_winner[(share.round_number - 1) as usize] = Winner::Cheong;
+				share.is_contest_winner();
+			});
 		});
 		
 		let scoreboard_hong_superiority_decision_btn = scoreboard.clone();
 		share.controls.hong_superiority_decision_btn.set_callback(move |_hong_superiority_decision_btn| {
 			scoreboard_hong_superiority_decision_btn.with_lock(|share| {
-				share.decide_winner(Winner::Hong);
-			})
+				share.hide_superiority_decision();
+				share.round_winner[(share.round_number - 1) as usize] = Winner::Hong;
+				share.is_contest_winner();
+			});
+		});
+		
+		let scoreboard_kye_shi_cancel_btn = scoreboard.clone();
+		share.controls.kye_shi_cancel_btn.set_callback(move |_kye_shi_cancel_btn| {
+			scoreboard_kye_shi_cancel_btn.with_lock(|share| {
+				share.hide_medical_timeout();
+				share.change_state(State::Timeout);
+				share.update_controls();
+			});
+		});
+		
+		let scoreboard_cheong_end_contest_btn = scoreboard.clone();
+		share.controls.cheong_end_contest_btn.set_callback(move |_cheong_end_contest_btn| {
+			scoreboard_cheong_end_contest_btn.with_lock(|share| {
+				share.hide_end_contest();
+				share.change_state(State::ContestWinner);
+				share.show_contest_winner(Winner::Cheong);
+				share.save_round_data();
+				share.save_contest_winner_data(Winner::Cheong);
+				share.write_data();
+			});
+		});
+		
+		let scoreboard_hong_end_contest_btn = scoreboard.clone();
+		share.controls.hong_end_contest_btn.set_callback(move |_hong_end_contest_btn| {
+			scoreboard_hong_end_contest_btn.with_lock(|share| {
+				share.hide_end_contest();
+				share.change_state(State::ContestWinner);
+				share.show_contest_winner(Winner::Hong);
+				share.save_round_data();
+				share.save_contest_winner_data(Winner::Hong);
+				share.write_data();
+			});
+		});
+		
+		let scoreboard_resume_contest_btn = scoreboard.clone();
+		share.controls.resume_contest_btn.set_callback(move |_resume_contest_btn| {
+			scoreboard_resume_contest_btn.with_lock(|share| {
+				share.hide_end_contest();
+				share.change_state(share.previous_state);
+				share.update_controls();
+				match share.state {
+					State::SuperiorityDecision => share.show_superiority_decision(),
+					_ => ()
+				}
+			});
+		});
+		
+		let scoreboard_clear_scoreboard_btn = scoreboard.clone();
+		share.controls.clear_scoreboard_btn.set_callback(move |_clear_scoreboard_btn| {
+			scoreboard_clear_scoreboard_btn.with_lock(|share| {
+				share.hide_contest_winner();
+				share.hide_display();
+				share.hide_screen();
+				share.hide_contest_number();
+				
+				share.clear_scoreboard();
+				
+				share.change_state(State::Settings);
+				share.update_controls();
+				share.show_settings();
+				
+				share.increment_contest_number_settings();
+				share.update_data();
+			});
 		});
 	});
 	
@@ -788,768 +776,67 @@ fn main() {
 		}
 		thread::sleep(Duration::from_millis(100));
 		scoreboard.with_lock(|share| {
-			if share.started {
-				if share.is_termination_condition() && !share.end_contest {
-					share.time_running = false;
-					
-					share.controls.kye_sok_btn.deactivate();
-					share.controls.kal_yeo_btn.deactivate();
-					share.controls.kye_shi_btn.deactivate();
-					share.controls.keu_man_btn.activate();
-					share.controls.end_contest_btn.activate();
-					
-					share.controls.plus_1_second_btn.activate();
-					share.controls.minus_1_second_btn.activate();
-					
-					share.display.time_lbl.set_color(enums::Color::White);
-					share.display.time_lbl.set_label_color(enums::Color::Black);
-					share.screen.time_lbl.set_color(enums::Color::White);
-					share.screen.time_lbl.set_label_color(enums::Color::Black);
-					share.variate_time(0f32);
-				} else {
-					if share.time_running {
-						share.variate_time(-0.1);
-					} else if !share.is_termination_condition() {
-						if !share.end_contest {
-							share.controls.kye_sok_btn.activate();
-							share.controls.keu_man_btn.deactivate();
-							share.controls.kye_shi_btn.activate();
-						}
-						if share.kye_shi_time_running {
-							share.controls.kye_sok_btn.deactivate();
-							share.controls.kye_shi_btn.deactivate();
-							share.controls.keu_man_btn.deactivate();
-							share.controls.end_contest_btn.deactivate();
-							share.variate_kye_shi_time(-0.1);
-						}
-						if share.kye_shi_time <= 0f32 {
-							share.controls.kye_shi_btn.deactivate();
-						}
-						if share.blink_time >= 0.5 {
-							if share.display.time_lbl.color() == enums::Color::White {
-								share.display.time_lbl.set_color(enums::Color::Black);
-								share.display.time_lbl.set_label_color(enums::Color::White);
-								share.screen.time_lbl.set_color(enums::Color::Black);
-								share.screen.time_lbl.set_label_color(enums::Color::White);
-							} else {
-								share.display.time_lbl.set_color(enums::Color::White);
-								share.display.time_lbl.set_label_color(enums::Color::Black);
-								share.screen.time_lbl.set_color(enums::Color::White);
-								share.screen.time_lbl.set_label_color(enums::Color::Black);
-							}
-							share.blink_time -= 0.5;
-						} else {
-							share.blink_time += 0.1;
-						}
-						share.variate_time(0f32);
+			match share.state {
+				State::None => {
+					share.change_state(State::Settings);
+					share.show_settings();
+					share.set_default_settings();
+					share.update_data();
+				},
+				State::Settings => {
+					share.validate_settings();
+				},
+				State::CallContestants => (),
+				State::Round => {
+					share.variate_time_round(-0.1);
+					if share.is_keu_man_conditions() {
+						share.change_state(State::KeumanCondition);
+						share.update_controls();
 					}
-				}
-			} else if share.rest {
-				if share.time_running {
-					share.variate_time(-0.1);
-					if ((share.rest_time - share.time)*10.).trunc() / 10. == 5f32 {
-						if share.reevaluate {
-							let winner = share.round_winner();
-							if let Winner::None = winner {
-								share.hide_contest_controls();
-								share.time_running = false;
-								share.show_superiority_decision_controls(false);
-							} else {
-								share.decide_winner(winner);
-							}
-						} else {
-							share.new_round_display();
-						}
-					} else if share.time == 0f32 {
-						share.display.round_rest_lbl.set_label("ROUND");
-						share.display.round_number_lbl.set_label(&share.round_number.to_string());
-						share.screen.round_rest_lbl.set_label("ROUND");
-						share.screen.round_number_lbl.set_label(&share.round_number.to_string());
-						share.variate_time(share.round_time);
-						share.controls.si_jak_btn.activate();
-						
-						share.rest = false;
-						share.started = false;
-						share.time_running = false;
+					share.update_display();
+					share.update_screen();
+				},
+				State::Timeout => {
+					share.blink_time += 0.1;
+					if share.blink_time >= 0.5 {
+						share.blink = !share.blink;
+						share.blink_time -= 0.5;
 					}
-				}
+					if share.is_keu_man_conditions() {
+						share.change_state(State::KeumanCondition);
+						share.update_controls();
+					}
+					share.update_display();
+					share.update_screen();
+				},
+				State::MedicalTimeout => {
+					share.variate_kye_shi_time(-0.1);
+					share.update_medical_timeout();
+				},
+				State::KeumanCondition => {
+					if !share.is_keu_man_conditions() {
+						share.change_state(State::Timeout);
+						share.update_controls();
+					}
+					share.update_display();
+					share.update_screen();
+				},
+				State::SuperiorityDecision => (),
+				State::RestFirstPart => {
+					share.variate_time_rest(-0.1);
+					share.is_after_5_seconds();
+					share.update_display();
+					share.update_screen();
+				},
+				State::RestSecondPart => {
+					share.variate_time_rest(-0.1);
+					share.time_ends();
+					share.update_display();
+					share.update_screen();
+				},
+				State::EndContest => (),
+				State::ContestWinner => ()
 			}
 		});
 	}
-}
-
-fn valid_input(input: &input::IntInput) -> bool {
-	match input.value().parse::<f32>() {
-		Ok(value) => {
-			if value <= 0f32 {
-				return false;
-			} else {
-				return true;
-			}
-		},
-		Err(_) => false
-	}
-}
-
-fn scale_size(size: f64, width: f64, height: f64) -> i32 {
-	(size * (width.powf(2.) + height.powf(2.)).sqrt() / 2000.) as i32
-}
-
-fn seung_lbl_dimensions(screen_width: f64, screen_height: f64) -> (f64, f64, i32) {
-	let w = screen_width * 1./9.;
-	let h = screen_height * 1./8.;
-	let d = w.min(h);
-	return ((w - d) / 2., ((h - d) / 2.), d as i32);
-}
-
-fn seung_screen_lbl_dimensions(screen_width: f64, screen_height: f64) -> (f64, f64, i32) {
-	let w = screen_width * 2./18.;
-	let h = screen_height * 3./16.;
-	let d = w.min(h);
-	return ((w - d) / 2., ((h - d) / 2.), d as i32);
-}
-
-fn cheong_score_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut cheong_score_lbl = frame::Frame::default()
-    	.with_pos(0, 0)
-		.with_size((screen_width * 1./3.) as i32, (screen_height * 1./2.) as i32);
-	cheong_score_lbl.set_frame(enums::FrameType::FlatBox);
-	cheong_score_lbl.set_color(enums::Color::Blue);
-	cheong_score_lbl.set_label_color(enums::Color::White);
-	return cheong_score_lbl;
-}
-
-fn cheong_gam_jeon_count_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut cheong_gam_jeon_count_lbl = frame::Frame::default()
-		.with_pos((screen_width * 1./3.) as i32, (screen_height * 2./16.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 2./16.) as i32);
-	cheong_gam_jeon_count_lbl.set_frame(enums::FrameType::FlatBox);
-	cheong_gam_jeon_count_lbl.set_color(enums::Color::Blue.darker());
-	cheong_gam_jeon_count_lbl.set_label_color(enums::Color::White);
-	return cheong_gam_jeon_count_lbl;
-}
-
-fn cheong_seung_lbl() -> frame::Frame {
-	let mut cheong_round_seung_lbl = frame::Frame::default();
-	cheong_round_seung_lbl.set_frame(enums::FrameType::OFlatFrame);
-	cheong_round_seung_lbl.set_color(enums::Color::Blue);
-	cheong_round_seung_lbl.hide();
-	return cheong_round_seung_lbl;
-}
-
-fn hong_score_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut hong_score_lbl = frame::Frame::default()
-    	.with_pos((screen_width * 2./3.) as i32, 0)
-		.with_size((screen_width *  1./3.) as i32, (screen_height * 1./2.) as i32);
-	hong_score_lbl.set_frame(enums::FrameType::FlatBox);
-	hong_score_lbl.set_color(enums::Color::Red);
-	hong_score_lbl.set_label_color(enums::Color::White);
-	return hong_score_lbl;
-}
-
-fn hong_gam_jeon_count_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut hong_gam_jeon_count_lbl = frame::Frame::default()
-		.with_pos((screen_width * 5./9.) as i32, (screen_height * 2./16.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 2./16.) as i32);
-	hong_gam_jeon_count_lbl.set_frame(enums::FrameType::FlatBox);
-	hong_gam_jeon_count_lbl.set_color(enums::Color::Red.darker());
-	hong_gam_jeon_count_lbl.set_label_color(enums::Color::White);
-	return hong_gam_jeon_count_lbl;
-}
-
-fn hong_seung_lbl() -> frame::Frame {
-	let mut hong_round_seung_lbl = frame::Frame::default();
-	hong_round_seung_lbl.set_frame(enums::FrameType::OFlatFrame);
-	hong_round_seung_lbl.set_color(enums::Color::Red);
-	hong_round_seung_lbl.hide();
-	return hong_round_seung_lbl;
-}
-
-fn round_rest_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut round_lbl = frame::Frame::default()
-		.with_pos((screen_width * 4./9.) as i32, 0)
-		.with_size((screen_width *  1./9.) as i32, (screen_height * 1./16.) as i32);
-	round_lbl.set_frame(enums::FrameType::FlatBox);
-	round_lbl.set_color(enums::Color::Black);
-	round_lbl.set_label_color(enums::Color::White);
-	return round_lbl;
-}
-
-fn round_number_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut round_number_lbl = frame::Frame::default()
-		.with_pos((screen_width * 4./9.) as i32, (screen_height * 1./16.) as i32)
-		.with_size((screen_width *  1./9.) as i32, (screen_height * 3./16.) as i32);
-	round_number_lbl.set_frame(enums::FrameType::FlatBox);
-	round_number_lbl.set_color(enums::Color::Black);
-	round_number_lbl.set_label_color(enums::Color::White);
-	return round_number_lbl;
-}
-
-fn time_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut time_lbl = frame::Frame::default()
-		.with_pos((screen_width * 1./3.) as i32, (screen_height * 1./4.) as i32)
-		.with_size((screen_width *  1./3.) as i32, (screen_height * 1./4.) as i32);
-	time_lbl.set_frame(enums::FrameType::FlatBox);
-	time_lbl.set_color(enums::Color::Black);
-	time_lbl.set_label_color(enums::Color::White);
-	return time_lbl;
-}
-
-fn kye_shi_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut kye_shi_lbl = frame::Frame::default()
-		.with_pos((screen_width * 1./3.) as i32, (screen_height * 4./8.) as i32)
-		.with_size((screen_width *  1./3.) as i32, (screen_height * 1./8.) as i32)
-		.with_label("Kye-shi");
-	kye_shi_lbl.set_frame(enums::FrameType::FlatBox);
-	kye_shi_lbl.hide();
-	return kye_shi_lbl;
-}
-
-fn kye_shi_time_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut kye_shi_time_lbl = frame::Frame::default()
-		.with_pos((screen_width * 1./3.) as i32, (screen_height * 5./8.) as i32)
-		.with_size((screen_width *  1./3.) as i32, (screen_height * 1./8.) as i32);
-	kye_shi_time_lbl.set_frame(enums::FrameType::FlatBox);
-	kye_shi_time_lbl.hide();
-	return kye_shi_time_lbl;
-}
-
-fn hong_score_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut hong_score_screen_lbl = frame::Frame::default()
-    	.with_pos(0, (screen_height * 3./16.) as i32)
-		.with_size((screen_width *  1./3.) as i32, (screen_height * 12./16.) as i32);
-	hong_score_screen_lbl.set_frame(enums::FrameType::FlatBox);
-	hong_score_screen_lbl.set_color(enums::Color::Red);
-	hong_score_screen_lbl.set_label_color(enums::Color::White);
-	hong_score_screen_lbl.hide();
-	return hong_score_screen_lbl;
-}
-
-fn hong_gam_jeon_count_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut hong_gam_jeon_count_screen_lbl = frame::Frame::default()
-		.with_pos((screen_width * 1./18.) as i32, 0)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 3./16.) as i32);
-	hong_gam_jeon_count_screen_lbl.set_frame(enums::FrameType::FlatBox);
-	hong_gam_jeon_count_screen_lbl.set_color(enums::Color::Red.darker());
-	hong_gam_jeon_count_screen_lbl.set_label_color(enums::Color::White);
-	hong_gam_jeon_count_screen_lbl.hide();
-	return hong_gam_jeon_count_screen_lbl;
-}
-
-fn hong_seung_screen_lbl() -> frame::Frame {
-	let mut hong_round_seung_screen_lbl = frame::Frame::default();
-	hong_round_seung_screen_lbl.set_frame(enums::FrameType::OFlatFrame);
-	hong_round_seung_screen_lbl.set_color(enums::Color::Red);
-	hong_round_seung_screen_lbl.hide();
-	return hong_round_seung_screen_lbl;
-}
-
-fn cheong_score_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut cheong_score_screen_lbl = frame::Frame::default()
-    	.with_pos((screen_width * 2./3.) as i32, (screen_height * 3./16.) as i32)
-		.with_size((screen_width * 1./3.) as i32, (screen_height * 12./16.) as i32);
-	cheong_score_screen_lbl.set_frame(enums::FrameType::FlatBox);
-	cheong_score_screen_lbl.set_color(enums::Color::Blue);
-	cheong_score_screen_lbl.set_label_color(enums::Color::White);
-	cheong_score_screen_lbl.hide();
-	return cheong_score_screen_lbl;
-}
-
-fn cheong_gam_jeon_count_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut cheong_gam_jeon_count_screen_lbl = frame::Frame::default()
-		.with_pos((screen_width * 15./18.) as i32, 0)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 3./16.) as i32);
-	cheong_gam_jeon_count_screen_lbl.set_frame(enums::FrameType::FlatBox);
-	cheong_gam_jeon_count_screen_lbl.set_color(enums::Color::Blue.darker());
-	cheong_gam_jeon_count_screen_lbl.set_label_color(enums::Color::White);
-	cheong_gam_jeon_count_screen_lbl.hide();
-	return cheong_gam_jeon_count_screen_lbl;
-}
-
-fn cheong_seung_screen_lbl() -> frame::Frame {
-	let mut cheong_round_seung_screen_lbl = frame::Frame::default();
-	cheong_round_seung_screen_lbl.set_frame(enums::FrameType::OFlatFrame);
-	cheong_round_seung_screen_lbl.set_color(enums::Color::Blue);
-	cheong_round_seung_screen_lbl.hide();
-	return cheong_round_seung_screen_lbl;
-}
-
-fn round_rest_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut round_screen_lbl = frame::Frame::default()
-		.with_pos((screen_width * 15./36.) as i32, (screen_height * 1./32.) as i32)
-		.with_size((screen_width *  3./18.) as i32, (screen_height * 3./32.) as i32);
-	round_screen_lbl.set_frame(enums::FrameType::FlatBox);
-	round_screen_lbl.set_color(enums::Color::Black);
-	round_screen_lbl.set_label_color(enums::Color::White);
-	round_screen_lbl.hide();
-	return round_screen_lbl;
-}
-
-fn round_number_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut round_number_screen_lbl = frame::Frame::default()
-		.with_pos((screen_width * 15./36.) as i32, (screen_height * 4./32.) as i32)
-		.with_size((screen_width *  3./18.) as i32, (screen_height * 7./32.) as i32);
-	round_number_screen_lbl.set_frame(enums::FrameType::FlatBox);
-	round_number_screen_lbl.set_color(enums::Color::Black);
-	round_number_screen_lbl.set_label_color(enums::Color::White);
-	round_number_screen_lbl.hide();
-	return round_number_screen_lbl;
-}
-
-fn time_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut time_screen_lbl = frame::Frame::default()
-		.with_pos((screen_width * 1./3.) as i32, (screen_height * 6./16.) as i32)
-		.with_size((screen_width *  1./3.) as i32, (screen_height * 5./16.) as i32);
-	time_screen_lbl.set_frame(enums::FrameType::FlatBox);
-	time_screen_lbl.set_color(enums::Color::Black);
-	time_screen_lbl.set_label_color(enums::Color::White);
-	time_screen_lbl.hide();
-	return time_screen_lbl;
-}
-
-fn kye_shi_time_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut kye_shi_time_screen_lbl = frame::Frame::default()
-		.with_pos(0, (screen_height * 1./4.) as i32)
-		.with_size(screen_width as i32, (screen_height * 2./4.) as i32);
-	kye_shi_time_screen_lbl.set_frame(enums::FrameType::FlatBox);
-	kye_shi_time_screen_lbl.set_color(enums::Color::White);
-	kye_shi_time_screen_lbl.set_label_color(enums::Color::Black);
-	kye_shi_time_screen_lbl.hide();
-	return kye_shi_time_screen_lbl;
-}
-
-fn round_time_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut round_time_lbl = frame::Frame::default()
-		.with_pos((screen_width * 4./9.) as i32, (screen_height * 28./48.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./32.) as i32)
-		.with_label("Round time:");
-	round_time_lbl.set_frame(enums::FrameType::FlatBox);
-	return round_time_lbl;
-}
-
-fn round_time_input(screen_width: f64, screen_height: f64) -> input::IntInput {
-	let mut round_time_input = input::IntInput::default()
-		.with_pos((screen_width * 4./9.) as i32, (screen_height * 10./16.) as i32)
-		.with_size((screen_width * 5./81.) as i32, (screen_height * 1./32.) as i32);
-	round_time_input.set_value("120");
-	return round_time_input;
-}
-
-fn round_time_seconds_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut round_time_seconds_lbl = frame::Frame::default()
-		.with_pos((screen_width * 41./81.) as i32, (screen_height * 10./16.) as i32)
-		.with_size((screen_width * 4./81.) as i32, (screen_height * 1./32.) as i32)
-		.with_label("seconds");
-	round_time_seconds_lbl.set_frame(enums::FrameType::FlatBox);
-	return round_time_seconds_lbl;
-}
-
-fn rest_time_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut rest_time_lbl = frame::Frame::default()
-		.with_pos((screen_width * 4./9.) as i32, (screen_height * 34./48.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./32.) as i32)
-		.with_label("Rest time:");
-	rest_time_lbl.set_frame(enums::FrameType::FlatBox);
-	return rest_time_lbl;
-}
-
-fn rest_time_input(screen_width: f64, screen_height: f64) -> input::IntInput {
-	let mut rest_time_input = input::IntInput::default()
-		.with_pos((screen_width * 4./9.) as i32, (screen_height * 12./16.) as i32)
-		.with_size((screen_width * 5./81.) as i32, (screen_height * 1./32.) as i32);
-	rest_time_input.set_value("60");
-	return rest_time_input;
-}
-
-fn rest_time_seconds_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut rest_time_seconds_lbl = frame::Frame::default()
-		.with_pos((screen_width * 41./81.) as i32, (screen_height * 12./16.) as i32)
-		.with_size((screen_width * 4./81.) as i32, (screen_height * 1./32.) as i32)
-		.with_label("seconds");
-	rest_time_seconds_lbl.set_frame(enums::FrameType::FlatBox);
-	return rest_time_seconds_lbl;
-}
-
-fn new_contest_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let new_contest_btn = button::Button::default()
-		.with_pos((screen_width * 4./9.) as i32, (screen_height * 14./16.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
-		.with_label("New contest");
-	return new_contest_btn;
-}
-
-fn si_jak_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut si_jak_btn = button::Button::default()
-		.with_pos((screen_width * 2./27.) as i32, (screen_height * 14./16.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
-		.with_label("Shi-jak");
-	si_jak_btn.hide();
-	return si_jak_btn;
-}
-
-fn kye_sok_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut kye_sok_btn = button::Button::default()
-		.with_pos((screen_width * 2./27.) as i32, (screen_height * 14./16.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
-		.with_label("Kye-sok");
-	kye_sok_btn.deactivate();
-	kye_sok_btn.hide();
-	return kye_sok_btn;
-}
-
-fn kal_yeo_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut kal_yeo_btn = button::Button::default()
-		.with_pos((screen_width * 7./27.) as i32, (screen_height * 14./16.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
-		.with_label("Kal-yeo");
-	kal_yeo_btn.deactivate();
-	kal_yeo_btn.hide();
-	return kal_yeo_btn;
-}
-
-fn kye_shi_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut kye_shi_btn = button::Button::default()
-		.with_pos((screen_width * 12./27.) as i32, (screen_height * 14./16.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
-		.with_label("Kye-shi");
-	kye_shi_btn.deactivate();
-	kye_shi_btn.hide();
-	return kye_shi_btn;
-}
-
-fn kye_shi_cancel_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut kye_shi_cancel_btn = button::Button::default()
-		.with_pos((screen_width * 12./27.) as i32, (screen_height * 25./32.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
-		.with_label("Cancel");
-	kye_shi_cancel_btn.hide();
-	return kye_shi_cancel_btn;
-}
-
-fn keu_man_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut keu_man_btn = button::Button::default()
-		.with_pos((screen_width * 17./27.) as i32, (screen_height * 14./16.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
-		.with_label("Keu-man");
-	keu_man_btn.deactivate();
-	keu_man_btn.hide();
-	return keu_man_btn;
-}
-
-fn end_contest_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut end_contest_btn = button::Button::default()
-		.with_pos((screen_width * 22./27.) as i32, (screen_height * 14./16.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
-		.with_label("End contest");
-	end_contest_btn.hide();
-	return end_contest_btn;
-}
-
-fn resume_contest_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut resume_contest_btn = button::Button::default()
-		.with_pos((screen_width * 22./27.) as i32, (screen_height * 14./16.) as i32)
-		.with_size((screen_width * 1./9.) as i32, (screen_height * 1./16.) as i32)
-		.with_label("Resume");
-	resume_contest_btn.hide();
-	return resume_contest_btn;
-}
-
-fn contest_winner_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut contest_winner_lbl = frame::Frame::default()
-		.with_pos((screen_width * 9./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 15./24.) as i32, (screen_width * 3./24.) as i32);
-	contest_winner_lbl.set_frame(enums::FrameType::FlatBox);
-	contest_winner_lbl.set_label_color(enums::Color::White);
-	return contest_winner_lbl;
-}
-
-fn contest_winner_screen_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut contest_winner_screen_lbl = frame::Frame::default()
-		.with_pos((screen_width * 1./3.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width *  1./3.) as i32, (screen_height * 4./16.) as i32);
-	contest_winner_screen_lbl.set_frame(enums::FrameType::FlatBox);
-	contest_winner_screen_lbl.set_label_color(enums::Color::White);
-	return contest_winner_screen_lbl;
-}
-
-fn cheong_plus_jirugi_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_plus_jirugi_btn = button::Button::default()
-		.with_pos((screen_width * 2./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	cheong_plus_jirugi_btn.set_color(enums::Color::Blue);
-	cheong_plus_jirugi_btn.hide();
-	return cheong_plus_jirugi_btn;
-}
-
-fn cheong_minus_jirugi_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_minus_jirugi_btn = button::Button::default()
-		.with_pos((screen_width * 2./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	cheong_minus_jirugi_btn.set_color(enums::Color::Blue);
-	cheong_minus_jirugi_btn.hide();
-	return cheong_minus_jirugi_btn;
-}
-
-fn cheong_plus_momtong_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_plus_momtong_btn = button::Button::default()
-		.with_pos((screen_width * 5./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	cheong_plus_momtong_btn.set_color(enums::Color::Blue);
-	cheong_plus_momtong_btn.hide();
-	return cheong_plus_momtong_btn;
-}
-
-fn cheong_minus_momtong_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_minus_momtong_btn = button::Button::default()
-		.with_pos((screen_width * 5./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	cheong_minus_momtong_btn.set_color(enums::Color::Blue);
-	cheong_minus_momtong_btn.hide();
-	return cheong_minus_momtong_btn;
-}
-
-fn cheong_plus_momdollyeo_momtong_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_plus_momdollyeo_momtong_btn = button::Button::default()
-		.with_pos((screen_width * 8./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	cheong_plus_momdollyeo_momtong_btn.set_color(enums::Color::Blue);
-	cheong_plus_momdollyeo_momtong_btn.hide();
-	return cheong_plus_momdollyeo_momtong_btn;
-}
-
-fn cheong_minus_momdollyeo_momtong_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_minus_momdollyeo_momtong_btn = button::Button::default()
-		.with_pos((screen_width * 8./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	cheong_minus_momdollyeo_momtong_btn.set_color(enums::Color::Blue);
-	cheong_minus_momdollyeo_momtong_btn.hide();
-	return cheong_minus_momdollyeo_momtong_btn;
-}
-
-fn cheong_plus_olgul_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_plus_olgul_btn = button::Button::default()
-		.with_pos((screen_width * 11./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	cheong_plus_olgul_btn.set_color(enums::Color::Blue);
-	cheong_plus_olgul_btn.hide();
-	return cheong_plus_olgul_btn;
-}
-
-fn cheong_minus_olgul_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_minus_olgul_btn = button::Button::default()
-		.with_pos((screen_width * 11./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	cheong_minus_olgul_btn.set_color(enums::Color::Blue);
-	cheong_minus_olgul_btn.hide();
-	return cheong_minus_olgul_btn;
-}
-
-fn cheong_plus_momdollyeo_olgul_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_plus_momdollyeo_olgul_btn = button::Button::default()
-		.with_pos((screen_width * 14./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	cheong_plus_momdollyeo_olgul_btn.set_color(enums::Color::Blue);
-	cheong_plus_momdollyeo_olgul_btn.hide();
-	return cheong_plus_momdollyeo_olgul_btn;
-}
-
-fn cheong_minus_momdollyeo_olgul_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_minus_momdollyeo_olgul_btn = button::Button::default()
-		.with_pos((screen_width * 14./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	cheong_minus_momdollyeo_olgul_btn.set_color(enums::Color::Blue);
-	cheong_minus_momdollyeo_olgul_btn.hide();
-	return cheong_minus_momdollyeo_olgul_btn;
-}
-
-fn cheong_plus_gam_jeon_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_plus_gam_jeon_btn = button::Button::default()
-		.with_pos((screen_width * 17./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 5./48.) as i32, (screen_width * 1./24.) as i32)
-		.with_label("+ Gam-jeon");
-	cheong_plus_gam_jeon_btn.set_color(enums::Color::Blue);
-	cheong_plus_gam_jeon_btn.set_label_color(enums::Color::White);
-	cheong_plus_gam_jeon_btn.hide();
-	return cheong_plus_gam_jeon_btn;
-}
-
-fn cheong_minus_gam_jeon_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_minus_gam_jeon_btn = button::Button::default()
-		.with_pos((screen_width * 17./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 5./48.) as i32, (screen_width * 1./24.) as i32)
-		.with_label("- Gam-jeon");
-	cheong_minus_gam_jeon_btn.set_color(enums::Color::Blue);
-	cheong_minus_gam_jeon_btn.set_label_color(enums::Color::White);
-	cheong_minus_gam_jeon_btn.hide();
-	return cheong_minus_gam_jeon_btn;
-}
-
-fn plus_1_second_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut plus_1_second_btn = button::Button::default()
-		.with_pos((screen_width * 23./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32)
-		.with_label("+ 1s");
-	plus_1_second_btn.hide();
-	return plus_1_second_btn;
-}
-
-fn minus_1_second_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut minus_1_second_btn = button::Button::default()
-		.with_pos((screen_width * 23./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32)
-		.with_label("- 1s");
-	minus_1_second_btn.hide();
-	return minus_1_second_btn;
-}
-
-fn hong_plus_gam_jeon_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_plus_gam_jeon_btn = button::Button::default()
-		.with_pos((screen_width * 26./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 5./48.) as i32, (screen_width * 1./24.) as i32)
-		.with_label("+ Gam-jeon");
-	hong_plus_gam_jeon_btn.set_color(enums::Color::Red);
-	hong_plus_gam_jeon_btn.set_label_color(enums::Color::White);
-	hong_plus_gam_jeon_btn.hide();
-	return hong_plus_gam_jeon_btn;
-}
-
-fn hong_minus_gam_jeon_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_minus_gam_jeon_btn = button::Button::default()
-		.with_pos((screen_width * 26./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 5./48.) as i32, (screen_width * 1./24.) as i32)
-		.with_label("- Gam-jeon");
-	hong_minus_gam_jeon_btn.set_color(enums::Color::Red);
-	hong_minus_gam_jeon_btn.set_label_color(enums::Color::White);
-	hong_minus_gam_jeon_btn.hide();
-	return hong_minus_gam_jeon_btn;
-}
-
-fn hong_plus_jirugi_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_plus_jirugi_btn = button::Button::default()
-		.with_pos((screen_width * 32./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	hong_plus_jirugi_btn.set_color(enums::Color::Red);
-	hong_plus_jirugi_btn.hide();
-	return hong_plus_jirugi_btn;
-}
-
-fn hong_minus_jirugi_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_minus_jirugi_btn = button::Button::default()
-		.with_pos((screen_width * 32./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	hong_minus_jirugi_btn.set_color(enums::Color::Red);
-	hong_minus_jirugi_btn.hide();
-	return hong_minus_jirugi_btn;
-}
-
-fn hong_plus_momtong_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_plus_momtong_btn = button::Button::default()
-		.with_pos((screen_width * 35./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	hong_plus_momtong_btn.set_color(enums::Color::Red);
-	hong_plus_momtong_btn.hide();
-	return hong_plus_momtong_btn;
-}
-
-fn hong_minus_momtong_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_minus_momtong_btn = button::Button::default()
-		.with_pos((screen_width * 35./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	hong_minus_momtong_btn.set_color(enums::Color::Red);
-	hong_minus_momtong_btn.hide();
-	return hong_minus_momtong_btn;
-}
-
-fn hong_plus_momdollyeo_momtong_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_plus_momdollyeo_momtong_btn = button::Button::default()
-		.with_pos((screen_width * 38./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	hong_plus_momdollyeo_momtong_btn.set_color(enums::Color::Red);
-	hong_plus_momdollyeo_momtong_btn.hide();
-	return hong_plus_momdollyeo_momtong_btn;
-}
-
-fn hong_minus_momdollyeo_momtong_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_minus_momdollyeo_momtong_btn = button::Button::default()
-		.with_pos((screen_width * 38./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	hong_minus_momdollyeo_momtong_btn.set_color(enums::Color::Red);
-	hong_minus_momdollyeo_momtong_btn.hide();
-	return hong_minus_momdollyeo_momtong_btn;
-}
-
-fn hong_plus_olgul_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_plus_olgul_btn = button::Button::default()
-		.with_pos((screen_width * 41./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	hong_plus_olgul_btn.set_color(enums::Color::Red);
-	hong_plus_olgul_btn.hide();
-	return hong_plus_olgul_btn;
-}
-
-fn hong_minus_olgul_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_minus_olgul_btn = button::Button::default()
-		.with_pos((screen_width * 41./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	hong_minus_olgul_btn.set_color(enums::Color::Red);
-	hong_minus_olgul_btn.hide();
-	return hong_minus_olgul_btn;
-}
-
-fn hong_plus_momdollyeo_olgul_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_plus_momdollyeo_olgul_btn = button::Button::default()
-		.with_pos((screen_width * 44./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	hong_plus_momdollyeo_olgul_btn.set_color(enums::Color::Red);
-	hong_plus_momdollyeo_olgul_btn.hide();
-	return hong_plus_momdollyeo_olgul_btn;
-}
-
-fn hong_minus_momdollyeo_olgul_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_minus_momdollyeo_olgul_btn = button::Button::default()
-		.with_pos((screen_width * 44./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 1./24.) as i32, (screen_width * 1./24.) as i32);
-	hong_minus_momdollyeo_olgul_btn.set_color(enums::Color::Red);
-	hong_minus_momdollyeo_olgul_btn.hide();
-	return hong_minus_momdollyeo_olgul_btn;
-}
-
-fn superiority_decision_lbl(screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut superiority_decision_lbl = frame::Frame::default()
-		.with_pos((screen_width * 17./48.) as i32, (screen_height * 9./16.) as i32)
-		.with_size((screen_width * 7./24.) as i32, (screen_width * 1./24.) as i32);
-	superiority_decision_lbl.set_frame(enums::FrameType::FlatBox);
-	superiority_decision_lbl.hide();
-	return superiority_decision_lbl;
-}
-
-fn cheong_superiority_decision_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut cheong_superiority_decision_btn = button::Button::default()
-		.with_pos((screen_width * 17./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 5./48.) as i32, (screen_width * 1./24.) as i32)
-		.with_label("Cheong");
-	cheong_superiority_decision_btn.set_color(enums::Color::Blue);
-	cheong_superiority_decision_btn.set_label_color(enums::Color::White);
-	cheong_superiority_decision_btn.hide();
-	return cheong_superiority_decision_btn;
-}
-
-fn hong_superiority_decision_btn(screen_width: f64, screen_height: f64) -> button::Button {
-	let mut hong_superiority_decision_btn = button::Button::default()
-		.with_pos((screen_width * 26./48.) as i32, (screen_height * 11./16.) as i32)
-		.with_size((screen_width * 5./48.) as i32, (screen_width * 1./24.) as i32)
-		.with_label("Hong");
-	hong_superiority_decision_btn.set_color(enums::Color::Red);
-	hong_superiority_decision_btn.set_label_color(enums::Color::White);
-	hong_superiority_decision_btn.hide();
-	return hong_superiority_decision_btn;
-}
-
-fn copyright(_screen_width: f64, screen_height: f64) -> frame::Frame {
-	let mut copyright = frame::Frame::default()
-		.with_pos(0, screen_height as i32)
-		.with_align(enums::Align::RightBottom)
-		.with_label(&format!("v{} -  Copyright (C) 2022 Iker Ruiz de Infante Gonzalez <contact@@irzinfante.eu>", env!("CARGO_PKG_VERSION")));
-	copyright.set_label_size(10);
-	return copyright;
 }
