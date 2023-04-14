@@ -2,7 +2,7 @@
 name = "tkd-scoreboard"
 version = "2.0.0"
 edition = "2021"
-authors = ["irzinfante <contact@irzinfante.eu>"]
+authors = ["irzinfante <iker@irzinfante.eu>"]
 repository = "https://github.com/irzinfante/tkd-scoreboard/"
 license = "GPL-3.0"
 
