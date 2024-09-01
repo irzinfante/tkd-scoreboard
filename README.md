@@ -1,6 +1,6 @@
 # tkd-scoreboard
 
-[![rust](https://img.shields.io/badge/rust-2021-dea584)](https://doc.rust-lang.org/edition-guide/rust-2021/index.html)
+[![rust](https://img.shields.io/badge/rust-1.73.0-dea584)](https://releases.rs/docs/1.73.0/)
 [![fltk-rs](https://img.shields.io/badge/fltk-%5E1.2-6f71b5)](https://crates.io/crates/fltk)
 [![fltk-rs](https://img.shields.io/badge/chrono-0.2.16-9978a3)](https://crates.io/crates/chrono)
 [![fltk-rs](https://img.shields.io/badge/directories-4.0.1-b57d96)](https://crates.io/crates/directories)
@@ -47,7 +47,7 @@ Put the Unix-like binary from releases downloads in `~/.local/bin` (remember to 
 
 ## License
 
-Copyright (C) 2022-2023 Iker Ruiz de Infante Gonzalez iker@irzinfante.eu
+Copyright (C) 2022-2024 Iker Ruiz de Infante Gonzalez iker@irzinfante.eu
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
