@@ -47,7 +47,7 @@ Put the Unix-like binary from releases downloads in `~/.local/bin` (remember to 
 
 ## License
 
-Copyright (C) 2022-2024 Iker Ruiz de Infante Gonzalez iker@irzinfante.eu
+Copyright (C) 2022-2024 Iker Ruiz de Infante Gonzalez iker@irzinfante.dev
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
