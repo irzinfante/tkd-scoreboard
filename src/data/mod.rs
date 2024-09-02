@@ -31,7 +31,7 @@ use crate::{
 pub mod groups;
 
 fn cache_dir() -> Option<String> {
-	if let Some(proj_dirs) = ProjectDirs::from("eu", "irzinfante", env!("CARGO_PKG_NAME")) {
+	if let Some(proj_dirs) = ProjectDirs::from("dev", "irzinfante", env!("CARGO_PKG_NAME")) {
     	proj_dirs.cache_dir().to_str().map(str::to_string)
     } else {
 		None
